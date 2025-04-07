@@ -170,12 +170,6 @@ const CoreFeatures = ({
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white rounded-md px-6 py-2 mt-4"
-                    onClick={() => (window.location.href = "/auth")}
-                  >
-                    Try Fintr <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
                 </div>
                 <div className="md:w-1/2">
                   <img

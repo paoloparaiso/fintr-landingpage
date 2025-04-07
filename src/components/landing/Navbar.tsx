@@ -14,9 +14,9 @@ const Navbar = ({
 }: NavbarProps) => {
   const navLinks = [
     { name: "Core Features", href: "/#core-features" },
-    { name: "What's Next", href: "/#whats-next" },
     { name: "Pricing", href: "/#pricing" },
-    { name: "Discover", href: "/#how-to-use" },
+    { name: "What's Next", href: "/whats-next" },
+    { name: "Discover", href: "/discover" },
   ];
 
   const [isOpen, setIsOpen] = useState(false);

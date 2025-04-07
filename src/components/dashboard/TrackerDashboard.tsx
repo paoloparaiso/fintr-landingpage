@@ -62,6 +62,11 @@ const TrackerDashboard = () => {
   const [showCustomCategoryInput, setShowCustomCategoryInput] = useState(false);
   const [customCategoryName, setCustomCategoryName] = useState("");
   const [customCategoryColor, setCustomCategoryColor] = useState("#008080");
+  const [editingBudgetIndex, setEditingBudgetIndex] = useState(null);
+  const [addSubcategory, setAddSubcategory] = useState(false);
+  const [parentCategory, setParentCategory] = useState("");
+  const [subcategoryName, setSubcategoryName] = useState("");
+  const [subcategoryBudget, setSubcategoryBudget] = useState("");
 
   // State for transaction filtering
   const [allTransactions, setAllTransactions] = useState<any[]>([]);
@@ -87,12 +92,67 @@ const TrackerDashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   const [categories, setCategories] = useState([
-    { name: "Food", spent: 8500, budget: 10000, color: "#008080" },
-    { name: "Transportation", spent: 3200, budget: 5000, color: "#D6A3A1" },
-    { name: "Entertainment", spent: 2800, budget: 3000, color: "#FF6F61" },
-    { name: "Utilities", spent: 4500, budget: 6000, color: "#800020" },
-    { name: "Shopping", spent: 6200, budget: 5000, color: "#CC5500" },
-    { name: "House", spent: 7500, budget: 8000, color: "#3D8D7F" },
+    {
+      name: "Food",
+      spent: 8500,
+      budget: 10000,
+      color: "#008080",
+      subcategories: [
+        { name: "Groceries", spent: 5000, budget: 6000 },
+        { name: "Dining Out", spent: 3500, budget: 4000 },
+      ],
+    },
+    {
+      name: "Transportation",
+      spent: 3200,
+      budget: 5000,
+      color: "#D6A3A1",
+      subcategories: [
+        { name: "Fuel", spent: 1800, budget: 3000 },
+        { name: "Public Transit", spent: 1400, budget: 2000 },
+      ],
+    },
+    {
+      name: "Entertainment",
+      spent: 2800,
+      budget: 3000,
+      color: "#FF6F61",
+      subcategories: [
+        { name: "Movies", spent: 800, budget: 1000 },
+        { name: "Subscriptions", spent: 2000, budget: 2000 },
+      ],
+    },
+    {
+      name: "Utilities",
+      spent: 4500,
+      budget: 6000,
+      color: "#800020",
+      subcategories: [
+        { name: "Electricity", spent: 2500, budget: 3000 },
+        { name: "Water", spent: 800, budget: 1000 },
+        { name: "Internet", spent: 1200, budget: 2000 },
+      ],
+    },
+    {
+      name: "Shopping",
+      spent: 6200,
+      budget: 5000,
+      color: "#CC5500",
+      subcategories: [
+        { name: "Clothing", spent: 3500, budget: 2500 },
+        { name: "Electronics", spent: 2700, budget: 2500 },
+      ],
+    },
+    {
+      name: "House",
+      spent: 7500,
+      budget: 8000,
+      color: "#3D8D7F",
+      subcategories: [
+        { name: "Rent", spent: 6000, budget: 6000 },
+        { name: "Maintenance", spent: 1500, budget: 2000 },
+      ],
+    },
   ]);
 
   // Helper functions for calendar view
@@ -286,6 +346,7 @@ const TrackerDashboard = () => {
         spent: 0,
         budget: parseFloat(newBudgetAmount) || 0,
         color: color,
+        subcategories: [],
       };
 
       // Update categories state
@@ -343,6 +404,10 @@ const TrackerDashboard = () => {
 
             {/* User profile and notifications */}
             <div className="flex items-center space-x-4">
+              <div>
+                <AddTransactionDialog />
+              </div>
+              {/* Database button moved to tabs */}
               <button className="text-[#0A3D62] hover:text-[#0A3D62]/80 relative">
                 <Bell className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
@@ -384,20 +449,15 @@ const TrackerDashboard = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-[#0A3D62]">
-                Dashboard
+                My Goal to Financial Freedom
               </h1>
               <p className="text-[#0A3D62]/70">
-                Track, analyze, and optimize your finances
+                Having enough passive income to cover my expenses and being able
+                to travel 3 months a year.
               </p>
             </div>
-            <div className="mt-4 md:mt-0 flex space-x-2">
-              <AddTransactionDialog />
-              <Button
-                variant="outline"
-                className="border-[#0A3D62] text-[#0A3D62]"
-              >
-                <Download className="h-4 w-4 mr-2" /> Export
-              </Button>
+            <div className="mt-4 md:mt-0">
+              {/* Empty div to maintain layout */}
             </div>
           </div>
 
@@ -407,15 +467,20 @@ const TrackerDashboard = () => {
             onValueChange={setActiveTab}
             value={activeTab}
           >
-            <TabsList className="grid grid-cols-4 md:w-[800px] mb-8">
+            <TabsList className="grid grid-cols-6 md:w-[960px] mb-8">
               <TabsTrigger value="transactions">Transactions</TabsTrigger>
-              <TabsTrigger value="budgets">Budgets</TabsTrigger>
+              <TabsTrigger value="budgets">Budget</TabsTrigger>
               <TabsTrigger value="goals">Goals</TabsTrigger>
+              <TabsTrigger value="investments">Investments</TabsTrigger>
               <TabsTrigger value="insights">Insights</TabsTrigger>
+              <TabsTrigger value="database">Database</TabsTrigger>
             </TabsList>
 
             {/* Transactions Tab */}
-            <TabsContent value="transactions" className="space-y-6">
+            <TabsContent
+              value="transactions"
+              className="space-y-6 grid grid-cols-1 gap-6"
+            >
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
@@ -751,12 +816,30 @@ const TrackerDashboard = () => {
                                             transaction.category}
                                         </p>
                                       </div>
-                                      <span
-                                        className={`font-medium ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}
-                                      >
-                                        {transaction.amount > 0 ? "+" : ""}
-                                        {formatCurrency(transaction.amount)}
-                                      </span>
+                                      <div className="flex items-center space-x-2">
+                                        <span
+                                          className={`font-medium ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}
+                                        >
+                                          {transaction.amount > 0 ? "+" : ""}
+                                          {formatCurrency(transaction.amount)}
+                                        </span>
+                                        <div className="flex space-x-1">
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-8 px-2 text-[#0A3D62]"
+                                          >
+                                            Edit
+                                          </Button>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-8 px-2 text-red-600 border-red-200 hover:bg-red-50"
+                                          >
+                                            Delete
+                                          </Button>
+                                        </div>
+                                      </div>
                                     </div>
                                   ))}
                                 </div>
@@ -782,12 +865,30 @@ const TrackerDashboard = () => {
                                       transaction.category}
                                   </p>
                                 </div>
-                                <span
-                                  className={`font-medium ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}
-                                >
-                                  {transaction.amount > 0 ? "+" : ""}
-                                  {formatCurrency(transaction.amount)}
-                                </span>
+                                <div className="flex items-center space-x-2">
+                                  <span
+                                    className={`font-medium ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}
+                                  >
+                                    {transaction.amount > 0 ? "+" : ""}
+                                    {formatCurrency(transaction.amount)}
+                                  </span>
+                                  <div className="flex space-x-1">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-8 px-2 text-[#0A3D62]"
+                                    >
+                                      Edit
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-8 px-2 text-red-600 border-red-200 hover:bg-red-50"
+                                    >
+                                      Delete
+                                    </Button>
+                                  </div>
+                                </div>
                               </div>
                             ));
                           }
@@ -846,24 +947,87 @@ const TrackerDashboard = () => {
                               return (
                                 <div
                                   key={index}
-                                  className={`p-2 rounded-md border ${hasTransaction ? "border-[#0A3D62]/20 bg-[#0A3D62]/5" : "border-gray-200"} min-h-[80px] text-center`}
+                                  className={`p-2 rounded-md border ${hasTransaction ? "border-[#0A3D62]/20 bg-[#0A3D62]/5" : "border-gray-200"} min-h-[80px] text-center cursor-pointer relative group`}
+                                  onClick={() => {
+                                    if (hasTransaction) {
+                                      // Show popup with transaction details
+                                      const popup = document.getElementById(
+                                        `day-popup-${day}`,
+                                      );
+                                      if (popup) {
+                                        popup.classList.toggle("hidden");
+                                      }
+                                    }
+                                  }}
                                 >
                                   <div className="font-medium text-[#0A3D62]">
                                     {day}
                                   </div>
                                   {hasTransaction && (
-                                    <div className="mt-1 text-xs">
-                                      {income > 0 && (
-                                        <div className="text-green-600">
-                                          +{formatCurrency(income)}
+                                    <>
+                                      <div className="mt-1 text-xs">
+                                        {income > 0 && (
+                                          <div className="text-green-600">
+                                            +{formatCurrency(income)}
+                                          </div>
+                                        )}
+                                        {expense < 0 && (
+                                          <div className="text-red-600">
+                                            {formatCurrency(expense)}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div
+                                        id={`day-popup-${day}`}
+                                        className="hidden absolute left-full top-0 z-50 w-64 p-3 bg-white shadow-lg rounded-lg border border-gray-200 text-left"
+                                      >
+                                        <h4 className="font-medium text-[#0A3D62] mb-2 text-sm">
+                                          Transactions for {day}{" "}
+                                          {selectedMonth
+                                            .charAt(0)
+                                            .toUpperCase() +
+                                            selectedMonth.slice(1)}
+                                        </h4>
+                                        <div className="max-h-48 overflow-y-auto">
+                                          {dayTransactions.map((t, idx) => (
+                                            <div
+                                              key={idx}
+                                              className="mb-2 pb-2 border-b border-gray-100 last:border-0"
+                                            >
+                                              <div className="flex justify-between items-center">
+                                                <span className="text-xs font-medium">
+                                                  {t.description}
+                                                </span>
+                                                <span
+                                                  className={`text-xs font-medium ${t.amount > 0 ? "text-green-600" : "text-red-600"}`}
+                                                >
+                                                  {t.amount > 0 ? "+" : ""}
+                                                  {formatCurrency(t.amount)}
+                                                </span>
+                                              </div>
+                                              <div className="text-xs text-gray-500">
+                                                {t.category}
+                                                {t.subcategory
+                                                  ? ` > ${t.subcategory}`
+                                                  : ""}
+                                              </div>
+                                            </div>
+                                          ))}
                                         </div>
-                                      )}
-                                      {expense < 0 && (
-                                        <div className="text-red-600">
-                                          {formatCurrency(expense)}
+                                        <div className="mt-2 pt-2 border-t border-gray-200">
+                                          <div className="flex justify-between items-center">
+                                            <span className="text-xs font-medium">
+                                              Total:
+                                            </span>
+                                            <span
+                                              className={`text-xs font-medium ${income + expense > 0 ? "text-green-600" : "text-red-600"}`}
+                                            >
+                                              {formatCurrency(income + expense)}
+                                            </span>
+                                          </div>
                                         </div>
-                                      )}
-                                    </div>
+                                      </div>
+                                    </>
                                   )}
                                 </div>
                               );
@@ -947,24 +1111,96 @@ const TrackerDashboard = () => {
                                       return (
                                         <div
                                           key={`${currentMonthName}-${currentYear}-${day}`}
-                                          className={`p-2 rounded-md border ${hasTransaction ? "border-[#0A3D62]/20 bg-[#0A3D62]/5" : "border-gray-200"} min-h-[80px] text-center`}
+                                          className={`p-2 rounded-md border ${hasTransaction ? "border-[#0A3D62]/20 bg-[#0A3D62]/5" : "border-gray-200"} min-h-[80px] text-center cursor-pointer relative group`}
+                                          onClick={() => {
+                                            if (hasTransaction) {
+                                              // Show popup with transaction details
+                                              const popup =
+                                                document.getElementById(
+                                                  `range-day-popup-${currentMonthName}-${currentYear}-${day}`,
+                                                );
+                                              if (popup) {
+                                                popup.classList.toggle(
+                                                  "hidden",
+                                                );
+                                              }
+                                            }
+                                          }}
                                         >
                                           <div className="font-medium text-[#0A3D62]">
                                             {day}
                                           </div>
                                           {hasTransaction && (
-                                            <div className="mt-1 text-xs">
-                                              {income > 0 && (
-                                                <div className="text-green-600">
-                                                  +{formatCurrency(income)}
+                                            <>
+                                              <div className="mt-1 text-xs">
+                                                {income > 0 && (
+                                                  <div className="text-green-600">
+                                                    +{formatCurrency(income)}
+                                                  </div>
+                                                )}
+                                                {expense < 0 && (
+                                                  <div className="text-red-600">
+                                                    {formatCurrency(expense)}
+                                                  </div>
+                                                )}
+                                              </div>
+                                              <div
+                                                id={`range-day-popup-${currentMonthName}-${currentYear}-${day}`}
+                                                className="hidden absolute left-full top-0 z-50 w-64 p-3 bg-white shadow-lg rounded-lg border border-gray-200 text-left"
+                                              >
+                                                <h4 className="font-medium text-[#0A3D62] mb-2 text-sm">
+                                                  Transactions for {day}{" "}
+                                                  {currentMonthName}{" "}
+                                                  {currentYear}
+                                                </h4>
+                                                <div className="max-h-48 overflow-y-auto">
+                                                  {dayTransactions.map(
+                                                    (t, idx) => (
+                                                      <div
+                                                        key={idx}
+                                                        className="mb-2 pb-2 border-b border-gray-100 last:border-0"
+                                                      >
+                                                        <div className="flex justify-between items-center">
+                                                          <span className="text-xs font-medium">
+                                                            {t.description}
+                                                          </span>
+                                                          <span
+                                                            className={`text-xs font-medium ${t.amount > 0 ? "text-green-600" : "text-red-600"}`}
+                                                          >
+                                                            {t.amount > 0
+                                                              ? "+"
+                                                              : ""}
+                                                            {formatCurrency(
+                                                              t.amount,
+                                                            )}
+                                                          </span>
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">
+                                                          {t.category}
+                                                          {t.subcategory
+                                                            ? ` > ${t.subcategory}`
+                                                            : ""}
+                                                        </div>
+                                                      </div>
+                                                    ),
+                                                  )}
                                                 </div>
-                                              )}
-                                              {expense < 0 && (
-                                                <div className="text-red-600">
-                                                  {formatCurrency(expense)}
+                                                <div className="mt-2 pt-2 border-t border-gray-200">
+                                                  <div className="flex justify-between items-center">
+                                                    <span className="text-xs font-medium">
+                                                      Total:
+                                                    </span>
+                                                    <span
+                                                      className={`text-xs font-medium ${income + expense > 0 ? "text-green-600" : "text-red-600"}`}
+                                                    >
+                                                      {formatCurrency(
+                                                        income + expense,
+                                                      )}
+                                                    </span>
+                                                  </div>
                                                 </div>
-                                              )}
-                                            </div>
+                                              </div>
+                                            </>
                                           )}
                                         </div>
                                       );
@@ -983,16 +1219,22 @@ const TrackerDashboard = () => {
             </TabsContent>
 
             {/* Goals Tab */}
-            <TabsContent value="goals" className="space-y-6">
+            <TabsContent
+              value="goals"
+              className="space-y-6 grid grid-cols-1 gap-6"
+            >
               <GoalSection formatCurrency={formatCurrency} />
             </TabsContent>
 
             {/* Budgets Tab */}
-            <TabsContent value="budgets" className="space-y-6">
+            <TabsContent
+              value="budgets"
+              className="space-y-6 grid grid-cols-1 gap-6"
+            >
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle>Monthly Budgets</CardTitle>
+                    <CardTitle>Monthly Budget</CardTitle>
                     <CardDescription>
                       Track your spending against budget limits
                     </CardDescription>
@@ -1007,59 +1249,6 @@ const TrackerDashboard = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* Budget Summary */}
-                  <Card className="mb-6">
-                    <CardHeader>
-                      <CardTitle>Budget Summary</CardTitle>
-                      <CardDescription>
-                        Overview of your budget status
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-[#f9f7f5] p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
-                            Total Budget
-                          </h4>
-                          <div className="text-2xl font-bold text-[#0A3D62]">
-                            {formatCurrency(
-                              categories.reduce(
-                                (sum, cat) => sum + cat.budget,
-                                0,
-                              ),
-                            )}
-                          </div>
-                        </div>
-                        <div className="bg-[#f9f7f5] p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
-                            Total Spent
-                          </h4>
-                          <div className="text-2xl font-bold text-[#0A3D62]">
-                            {formatCurrency(
-                              categories.reduce(
-                                (sum, cat) => sum + cat.spent,
-                                0,
-                              ),
-                            )}
-                          </div>
-                        </div>
-                        <div className="bg-[#f9f7f5] p-4 rounded-lg">
-                          <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
-                            Remaining
-                          </h4>
-                          <div className="text-2xl font-bold text-[#0A3D62]">
-                            {formatCurrency(
-                              categories.reduce(
-                                (sum, cat) => sum + (cat.budget - cat.spent),
-                                0,
-                              ),
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
                   {/* Budget Filters */}
                   <Card className="mb-6">
                     <CardHeader>
@@ -1074,7 +1263,6 @@ const TrackerDashboard = () => {
                           <Label>View Type</Label>
                           <Select
                             defaultValue="single"
-                            value={budgetFilterType}
                             onValueChange={(value) =>
                               setBudgetFilterType(value)
                             }
@@ -1283,6 +1471,59 @@ const TrackerDashboard = () => {
                     </CardContent>
                   </Card>
 
+                  {/* Budget Summary */}
+                  <Card className="mb-6">
+                    <CardHeader>
+                      <CardTitle>Budget Summary</CardTitle>
+                      <CardDescription>
+                        Overview of your budget status
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-[#f9f7f5] p-4 rounded-lg">
+                          <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
+                            Total Budget
+                          </h4>
+                          <div className="text-2xl font-bold text-[#0A3D62]">
+                            {formatCurrency(
+                              categories.reduce(
+                                (sum, cat) => sum + cat.budget,
+                                0,
+                              ),
+                            )}
+                          </div>
+                        </div>
+                        <div className="bg-[#f9f7f5] p-4 rounded-lg">
+                          <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
+                            Total Spent
+                          </h4>
+                          <div className="text-2xl font-bold text-[#0A3D62]">
+                            {formatCurrency(
+                              categories.reduce(
+                                (sum, cat) => sum + cat.spent,
+                                0,
+                              ),
+                            )}
+                          </div>
+                        </div>
+                        <div className="bg-[#f9f7f5] p-4 rounded-lg">
+                          <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
+                            Remaining
+                          </h4>
+                          <div className="text-2xl font-bold text-[#0A3D62]">
+                            {formatCurrency(
+                              categories.reduce(
+                                (sum, cat) => sum + (cat.budget - cat.spent),
+                                0,
+                              ),
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {showBudgetForm && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
@@ -1291,48 +1532,123 @@ const TrackerDashboard = () => {
                         </h3>
 
                         <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="budget-category">Category</Label>
-                            <Select
-                              value={newBudgetCategory}
-                              onValueChange={(value) => {
-                                setNewBudgetCategory(value);
-                                if (value === "custom") {
-                                  setShowCustomCategoryInput(true);
-                                } else {
-                                  setShowCustomCategoryInput(false);
-                                }
-                              }}
-                            >
-                              <SelectTrigger id="budget-category">
-                                <SelectValue placeholder="Select category" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="food">Food</SelectItem>
-                                <SelectItem value="transportation">
-                                  Transportation
-                                </SelectItem>
-                                <SelectItem value="utilities">
-                                  Utilities
-                                </SelectItem>
-                                <SelectItem value="entertainment">
-                                  Entertainment
-                                </SelectItem>
-                                <SelectItem value="shopping">
-                                  Shopping
-                                </SelectItem>
-                                <SelectItem value="house">House</SelectItem>
-                                <SelectItem value="health">Health</SelectItem>
-                                <SelectItem value="education">
-                                  Education
-                                </SelectItem>
-                                <SelectItem value="custom">
-                                  Add Custom Category
-                                </SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
+                          <div className="flex flex-col space-y-3 mb-4">
+                            <h4 className="text-sm font-medium text-[#0A3D62]">
+                              Budget Type
+                            </h4>
+                            <div className="bg-gray-100 rounded-lg p-1 flex w-full max-w-xs">
+                              <button
+                                onClick={() => setAddSubcategory(false)}
+                                className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${!addSubcategory ? "bg-[#0A3D62] text-white" : "text-[#0A3D62]"}`}
+                              >
+                                Category
+                              </button>
+                              <button
+                                onClick={() => setAddSubcategory(true)}
+                                className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${addSubcategory ? "bg-[#0A3D62] text-white" : "text-[#0A3D62]"}`}
+                              >
+                                Subcategory
+                              </button>
+                            </div>
                           </div>
+
+                          {addSubcategory ? (
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="parent-category">
+                                  Parent Category
+                                </Label>
+                                <Select
+                                  value={parentCategory}
+                                  onValueChange={setParentCategory}
+                                >
+                                  <SelectTrigger id="parent-category">
+                                    <SelectValue placeholder="Select parent category" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {categories.map((cat) => (
+                                      <SelectItem
+                                        key={cat.name}
+                                        value={cat.name.toLowerCase()}
+                                      >
+                                        {cat.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="subcategory-name">
+                                  Subcategory Name
+                                </Label>
+                                <Input
+                                  id="subcategory-name"
+                                  placeholder="Enter subcategory name"
+                                  value={subcategoryName}
+                                  onChange={(e) =>
+                                    setSubcategoryName(e.target.value)
+                                  }
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="subcategory-budget">
+                                  Budget Amount
+                                </Label>
+                                <Input
+                                  id="subcategory-budget"
+                                  type="number"
+                                  placeholder="0.00"
+                                  value={subcategoryBudget}
+                                  onChange={(e) =>
+                                    setSubcategoryBudget(e.target.value)
+                                  }
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label htmlFor="budget-category">Category</Label>
+                              <Select
+                                value={newBudgetCategory}
+                                onValueChange={(value) => {
+                                  setNewBudgetCategory(value);
+                                  if (value === "custom") {
+                                    setShowCustomCategoryInput(true);
+                                  } else {
+                                    setShowCustomCategoryInput(false);
+                                  }
+                                }}
+                              >
+                                <SelectTrigger id="budget-category">
+                                  <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="food">Food</SelectItem>
+                                  <SelectItem value="transportation">
+                                    Transportation
+                                  </SelectItem>
+                                  <SelectItem value="utilities">
+                                    Utilities
+                                  </SelectItem>
+                                  <SelectItem value="entertainment">
+                                    Entertainment
+                                  </SelectItem>
+                                  <SelectItem value="shopping">
+                                    Shopping
+                                  </SelectItem>
+                                  <SelectItem value="house">House</SelectItem>
+                                  <SelectItem value="health">Health</SelectItem>
+                                  <SelectItem value="education">
+                                    Education
+                                  </SelectItem>
+                                  <SelectItem value="custom">
+                                    Add Custom Category
+                                  </SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
 
                           {showCustomCategoryInput && (
                             <div className="space-y-2 mt-4">
@@ -1375,18 +1691,22 @@ const TrackerDashboard = () => {
                             </div>
                           )}
 
-                          <div className="space-y-2">
-                            <Label htmlFor="budget-amount">Budget Amount</Label>
-                            <Input
-                              id="budget-amount"
-                              type="number"
-                              placeholder="0.00"
-                              value={newBudgetAmount}
-                              onChange={(e) =>
-                                setNewBudgetAmount(e.target.value)
-                              }
-                            />
-                          </div>
+                          {!addSubcategory && (
+                            <div className="space-y-2">
+                              <Label htmlFor="budget-amount">
+                                Budget Amount
+                              </Label>
+                              <Input
+                                id="budget-amount"
+                                type="number"
+                                placeholder="0.00"
+                                value={newBudgetAmount}
+                                onChange={(e) =>
+                                  setNewBudgetAmount(e.target.value)
+                                }
+                              />
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex justify-end space-x-2 mt-6">
@@ -1399,119 +1719,179 @@ const TrackerDashboard = () => {
                           <Button
                             className="bg-[#0A3D62] hover:bg-[#0A3D62]/80"
                             onClick={() => {
-                              // Add budget logic
-                              const saveBudget = async () => {
-                                try {
-                                  let categoryId;
+                              if (addSubcategory) {
+                                // Add subcategory logic
+                                if (
+                                  parentCategory &&
+                                  subcategoryName &&
+                                  subcategoryBudget
+                                ) {
+                                  const updatedCategories = [...categories];
+                                  const parentCategoryIndex =
+                                    updatedCategories.findIndex(
+                                      (cat) =>
+                                        cat.name.toLowerCase() ===
+                                        parentCategory.toLowerCase(),
+                                    );
 
-                                  // If custom category, save it first
-                                  if (
-                                    newBudgetCategory === "custom" &&
-                                    customCategoryName
-                                  ) {
-                                    const {
-                                      data: categoryData,
-                                      error: categoryError,
-                                    } = await supabase
-                                      .from("categories")
-                                      .insert([
-                                        {
-                                          name: customCategoryName,
-                                          color: customCategoryColor,
-                                          user_id: "current-user-id", // Replace with actual user ID
-                                        },
-                                      ])
-                                      .select();
+                                  if (parentCategoryIndex >= 0) {
+                                    // Create subcategories array if it doesn't exist
+                                    if (
+                                      !updatedCategories[parentCategoryIndex]
+                                        .subcategories
+                                    ) {
+                                      updatedCategories[
+                                        parentCategoryIndex
+                                      ].subcategories = [];
+                                    }
 
-                                    if (categoryError) throw categoryError;
-                                    categoryId = categoryData[0].id;
-                                  } else {
-                                    categoryId = newBudgetCategory;
+                                    // Add new subcategory
+                                    updatedCategories[
+                                      parentCategoryIndex
+                                    ].subcategories.push({
+                                      name: subcategoryName,
+                                      spent: 0,
+                                      budget: parseFloat(subcategoryBudget),
+                                    });
+
+                                    setCategories(updatedCategories);
                                   }
 
-                                  // Save the budget
-                                  const {
-                                    data: budgetData,
-                                    error: budgetError,
-                                  } = await supabase.from("budgets").insert([
-                                    {
-                                      user_id: "current-user-id", // Replace with actual user ID
-                                      category_id: categoryId,
-                                      amount: parseFloat(newBudgetAmount),
-                                      period: "monthly",
-                                      start_date: new Date()
-                                        .toISOString()
-                                        .split("T")[0],
-                                      end_date: null,
-                                    },
-                                  ]);
+                                  // Reset form
+                                  setParentCategory("");
+                                  setSubcategoryName("");
+                                  setSubcategoryBudget("");
+                                  setAddSubcategory(false);
+                                  setShowBudgetForm(false);
+                                }
+                              } else {
+                                // Add budget logic
+                                const saveBudget = async () => {
+                                  try {
+                                    let categoryId;
 
-                                  if (budgetError) throw budgetError;
+                                    // If custom category, save it first
+                                    if (
+                                      newBudgetCategory === "custom" &&
+                                      customCategoryName
+                                    ) {
+                                      const {
+                                        data: categoryData,
+                                        error: categoryError,
+                                      } = await supabase
+                                        .from("categories")
+                                        .insert([
+                                          {
+                                            name: customCategoryName,
+                                            color: customCategoryColor,
+                                            user_id: "current-user-id", // Replace with actual user ID
+                                          },
+                                        ])
+                                        .select();
 
-                                  // Update local state with new budget
-                                  const newBudget = {
+                                      if (categoryError) throw categoryError;
+                                      categoryId = categoryData[0].id;
+                                    } else {
+                                      categoryId = newBudgetCategory;
+                                    }
+
+                                    // Save the budget
+                                    const {
+                                      data: budgetData,
+                                      error: budgetError,
+                                    } = await supabase.from("budgets").insert([
+                                      {
+                                        user_id: "current-user-id", // Replace with actual user ID
+                                        category_id: categoryId,
+                                        amount: parseFloat(newBudgetAmount),
+                                        period: "monthly",
+                                        start_date: new Date()
+                                          .toISOString()
+                                          .split("T")[0],
+                                        end_date: null,
+                                      },
+                                    ]);
+
+                                    if (budgetError) throw budgetError;
+
+                                    // Update local state with new budget
+                                    const newBudget = {
+                                      name:
+                                        customCategoryName || newBudgetCategory,
+                                      spent: 0,
+                                      budget: parseFloat(newBudgetAmount),
+                                      color: customCategoryColor || "#008080",
+                                      subcategories: [],
+                                    };
+
+                                    // Update categories state
+                                    setCategories([...categories, newBudget]);
+
+                                    console.log("Budget saved successfully");
+                                  } catch (error) {
+                                    console.error(
+                                      "Error saving budget:",
+                                      error,
+                                    );
+                                  }
+                                };
+
+                                if (editingBudgetIndex !== null) {
+                                  // Update existing budget
+                                  const updatedCategories = [...categories];
+                                  updatedCategories[editingBudgetIndex] = {
+                                    ...updatedCategories[editingBudgetIndex],
                                     name:
                                       customCategoryName || newBudgetCategory,
-                                    spent: 0,
                                     budget: parseFloat(newBudgetAmount),
-                                    color: customCategoryColor || "#008080",
-                                  };
-
-                                  // Update categories state
-                                  setCategories([...categories, newBudget]);
-
-                                  console.log("Budget saved successfully");
-                                } catch (error) {
-                                  console.error("Error saving budget:", error);
-                                }
-                              };
-
-                              if (editingBudgetIndex !== null) {
-                                // Update existing budget
-                                const updatedCategories = [...categories];
-                                updatedCategories[editingBudgetIndex] = {
-                                  ...updatedCategories[editingBudgetIndex],
-                                  name: customCategoryName || newBudgetCategory,
-                                  budget: parseFloat(newBudgetAmount),
-                                  color:
-                                    customCategoryColor ||
-                                    updatedCategories[editingBudgetIndex].color,
-                                };
-                                setCategories(updatedCategories);
-                                setEditingBudgetIndex(null);
-                              } else {
-                                // Check if category already exists
-                                const existingCategoryIndex =
-                                  categories.findIndex(
-                                    (cat) =>
-                                      cat.name.toLowerCase() ===
-                                      (
-                                        customCategoryName || newBudgetCategory
-                                      ).toLowerCase(),
-                                  );
-
-                                if (existingCategoryIndex >= 0) {
-                                  // Update existing category
-                                  const updatedCategories = [...categories];
-                                  updatedCategories[existingCategoryIndex] = {
-                                    ...updatedCategories[existingCategoryIndex],
-                                    budget: parseFloat(newBudgetAmount),
+                                    color:
+                                      customCategoryColor ||
+                                      updatedCategories[editingBudgetIndex]
+                                        .color,
                                   };
                                   setCategories(updatedCategories);
+                                  setEditingBudgetIndex(null);
                                 } else {
-                                  // Create new budget
-                                  saveBudget();
-                                }
-                              }
+                                  // Check if category already exists
+                                  const existingCategoryIndex =
+                                    categories.findIndex(
+                                      (cat) =>
+                                        cat.name.toLowerCase() ===
+                                        (
+                                          customCategoryName ||
+                                          newBudgetCategory
+                                        ).toLowerCase(),
+                                    );
 
-                              setShowBudgetForm(false);
-                              setNewBudgetCategory("");
-                              setNewBudgetAmount("");
-                              setShowCustomCategoryInput(false);
-                              setCustomCategoryName("");
+                                  if (existingCategoryIndex >= 0) {
+                                    // Update existing category
+                                    const updatedCategories = [...categories];
+                                    updatedCategories[existingCategoryIndex] = {
+                                      ...updatedCategories[
+                                        existingCategoryIndex
+                                      ],
+                                      budget: parseFloat(newBudgetAmount),
+                                    };
+                                    setCategories(updatedCategories);
+                                  } else {
+                                    // Create new budget
+                                    saveBudget();
+                                  }
+                                }
+
+                                setShowBudgetForm(false);
+                                setNewBudgetCategory("");
+                                setNewBudgetAmount("");
+                                setShowCustomCategoryInput(false);
+                                setCustomCategoryName("");
+                              }
                             }}
                           >
-                            {editingBudgetIndex !== null ? "Update" : "Create"}
+                            {editingBudgetIndex !== null
+                              ? "Update"
+                              : addSubcategory
+                                ? "Add Subcategory"
+                                : "Create"}
                           </Button>
                         </div>
                       </div>
@@ -1520,78 +1900,120 @@ const TrackerDashboard = () => {
 
                   <div className="space-y-6">
                     {categories.map((category, index) => (
-                      <div key={index} className="p-4 border rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium text-[#0A3D62]">
-                            {category.name}
-                          </h3>
-                          <div className="flex items-center space-x-2">
-                            <div className="text-sm font-medium">
-                              <span
-                                className={
-                                  category.spent > category.budget
-                                    ? "text-red-600"
-                                    : "text-[#0A3D62]"
-                                }
-                              >
-                                {formatCurrency(category.spent)}
-                              </span>
-                              <span className="text-[#0A3D62]/70">
-                                {" "}
-                                / {formatCurrency(category.budget)}
-                              </span>
-                            </div>
-                            <div className="flex space-x-1">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 px-2 text-[#0A3D62]"
-                                onClick={() => {
-                                  // Set editing state
-                                  setEditingBudgetIndex(index);
-                                  setNewBudgetCategory(
-                                    category.name.toLowerCase(),
-                                  );
-                                  setNewBudgetAmount(
-                                    category.budget.toString(),
-                                  );
-                                  setShowBudgetForm(true);
-                                }}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 px-2 text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => {
-                                  // Remove category from the list
-                                  const updatedCategories = [...categories];
-                                  updatedCategories.splice(index, 1);
-                                  setCategories(updatedCategories);
-                                }}
-                              >
-                                Delete
-                              </Button>
+                      <div
+                        key={index}
+                        className="p-4 border rounded-lg space-y-4"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-medium text-[#0A3D62]">
+                              {category.name}
+                            </h3>
+                            <div className="flex items-center space-x-2">
+                              <div className="text-sm font-medium">
+                                <span
+                                  className={
+                                    category.spent > category.budget
+                                      ? "text-red-600"
+                                      : "text-[#0A3D62]"
+                                  }
+                                >
+                                  {formatCurrency(category.spent)}
+                                </span>
+                                <span className="text-[#0A3D62]/70">
+                                  {" "}
+                                  / {formatCurrency(category.budget)}
+                                </span>
+                              </div>
+                              <div className="flex space-x-1">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-8 px-2 text-[#0A3D62]"
+                                  onClick={() => {
+                                    setEditingBudgetIndex(index);
+                                    setNewBudgetCategory(
+                                      category.name.toLowerCase(),
+                                    );
+                                    setNewBudgetAmount(
+                                      category.budget.toString(),
+                                    );
+                                    setCustomCategoryColor(category.color);
+                                    setShowBudgetForm(true);
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-8 px-2 text-red-600 border-red-200 hover:bg-red-50"
+                                  onClick={() => {
+                                    const updatedCategories = [...categories];
+                                    updatedCategories.splice(index, 1);
+                                    setCategories(updatedCategories);
+                                  }}
+                                >
+                                  Delete
+                                </Button>
+                              </div>
                             </div>
                           </div>
+                          <Progress
+                            value={(category.spent / category.budget) * 100}
+                            className="h-2 bg-gray-200"
+                            indicatorClassName={`${category.spent > category.budget ? "bg-red-500" : "bg-[#0A3D62]"}`}
+                          />
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
-                          <div
-                            className={`h-2.5 rounded-full ${category.spent > category.budget ? "bg-red-500" : ""}`}
-                            style={{
-                              width: `${Math.min(100, (category.spent / category.budget) * 100)}%`,
-                              backgroundColor:
-                                category.spent > category.budget
-                                  ? ""
-                                  : category.color,
-                            }}
-                          ></div>
-                        </div>
-                        <div className="mt-2 text-sm text-[#0A3D62]/70">
-                          {category.spent > category.budget
-                            ? `${formatCurrency(category.spent - category.budget)} over budget`
-                            : `${formatCurrency(category.budget - category.spent)} remaining`}
+
+                        {/* Subcategories */}
+                        <div className="pl-4 space-y-3 mt-3">
+                          {category.subcategories &&
+                            category.subcategories.map(
+                              (subcategory, subIndex) => (
+                                <div
+                                  key={`${index}-${subIndex}`}
+                                  className="border-l-2 pl-4"
+                                  style={{ borderColor: category.color }}
+                                >
+                                  <div className="flex items-center justify-between mb-1">
+                                    <h4 className="text-sm font-medium text-[#0A3D62]">
+                                      {subcategory.name}
+                                    </h4>
+                                    <div className="text-xs font-medium">
+                                      <span
+                                        className={
+                                          subcategory.spent > subcategory.budget
+                                            ? "text-red-600"
+                                            : "text-[#0A3D62]"
+                                        }
+                                      >
+                                        {formatCurrency(subcategory.spent)}
+                                      </span>
+                                      <span className="text-[#0A3D62]/70">
+                                        {" "}
+                                        / {formatCurrency(subcategory.budget)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <Progress
+                                    value={
+                                      (subcategory.spent / subcategory.budget) *
+                                      100
+                                    }
+                                    className="h-1.5 bg-gray-200"
+                                    indicatorClassName={`${subcategory.spent > subcategory.budget ? "bg-red-500" : "bg-[#0A3D62]/80"}`}
+                                  />
+                                </div>
+                              ),
+                            )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs h-7 text-[#0A3D62] mt-2"
+                          >
+                            <Plus className="h-3 w-3 mr-1" /> Add Subcategory
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -1600,575 +2022,1004 @@ const TrackerDashboard = () => {
               </Card>
             </TabsContent>
 
-            {/* Insights Tab (with Overview merged in) */}
-            <TabsContent value="insights" className="space-y-6">
-              <Card className="mb-6">
+            {/* Database Tab */}
+            <TabsContent
+              value="database"
+              className="space-y-6 grid grid-cols-1 gap-6"
+            >
+              <Card>
                 <CardHeader>
-                  <CardTitle>Insights Filters</CardTitle>
+                  <CardTitle>Database Management</CardTitle>
                   <CardDescription>
-                    Customize your financial insights view
+                    Manage your financial data and records
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="space-y-2 md:w-1/4">
-                      <Label>View Type</Label>
-                      <Select
-                        defaultValue="single"
-                        onValueChange={(value) => setFilterType(value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select view type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="single">Single Month</SelectItem>
-                          <SelectItem value="range">Month Range</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Categories</CardTitle>
+                          <CardDescription>
+                            Manage your expense and income categories
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {categories.map((category, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                              >
+                                <div className="flex items-center">
+                                  <div
+                                    className="w-4 h-4 rounded-full mr-3"
+                                    style={{ backgroundColor: category.color }}
+                                  />
+                                  <span className="font-medium text-[#0A3D62]">
+                                    {category.name}
+                                  </span>
+                                </div>
+                                <div className="flex space-x-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 px-2 text-[#0A3D62]"
+                                    onClick={() => {
+                                      setEditingBudgetIndex(index);
+                                      setNewBudgetCategory(
+                                        category.name.toLowerCase(),
+                                      );
+                                      setCustomCategoryColor(category.color);
+                                      setShowBudgetForm(true);
+                                    }}
+                                  >
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 px-2 text-red-600 border-red-200 hover:bg-red-50"
+                                  >
+                                    Delete
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <Button
+                            className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 mt-4 w-full"
+                            onClick={() => {
+                              setNewBudgetCategory("custom");
+                              setShowCustomCategoryInput(true);
+                              setShowBudgetForm(true);
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" /> Add New Category
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Data Import/Export</CardTitle>
+                          <CardDescription>
+                            Manage your financial data
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div className="p-4 border rounded-lg">
+                              <h3 className="font-medium text-[#0A3D62] mb-2">
+                                Import Data
+                              </h3>
+                              <p className="text-sm text-[#0A3D62]/70 mb-3">
+                                Upload CSV files from your bank or other
+                                financial services
+                              </p>
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  variant="outline"
+                                  className="text-[#0A3D62]"
+                                >
+                                  Choose File
+                                </Button>
+                                <Button className="bg-[#0A3D62] hover:bg-[#0A3D62]/80">
+                                  Upload
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="p-4 border rounded-lg">
+                              <h3 className="font-medium text-[#0A3D62] mb-2">
+                                Export Data
+                              </h3>
+                              <p className="text-sm text-[#0A3D62]/70 mb-3">
+                                Download your financial data for backup or
+                                analysis
+                              </p>
+                              <div className="flex items-center space-x-2">
+                                <Button className="bg-[#0A3D62] hover:bg-[#0A3D62]/80">
+                                  <Download className="h-4 w-4 mr-2" /> Export
+                                  as CSV
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
                     </div>
 
-                    {filterType === "single" ? (
-                      <>
-                        <div className="space-y-2 md:w-1/4">
-                          <Label>Month</Label>
-                          <Select defaultValue={selectedMonth}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select month" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="january">January</SelectItem>
-                              <SelectItem value="february">February</SelectItem>
-                              <SelectItem value="march">March</SelectItem>
-                              <SelectItem value="april">April</SelectItem>
-                              <SelectItem value="may">May</SelectItem>
-                              <SelectItem value="june">June</SelectItem>
-                              <SelectItem value="july">July</SelectItem>
-                              <SelectItem value="august">August</SelectItem>
-                              <SelectItem value="september">
-                                September
-                              </SelectItem>
-                              <SelectItem value="october">October</SelectItem>
-                              <SelectItem value="november">November</SelectItem>
-                              <SelectItem value="december">December</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Data Management</CardTitle>
+                        <CardDescription>
+                          Clean up and organize your financial records
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="p-4 border rounded-lg">
+                              <h3 className="font-medium text-[#0A3D62] mb-2">
+                                Bulk Delete
+                              </h3>
+                              <p className="text-sm text-[#0A3D62]/70 mb-3">
+                                Remove multiple transactions at once
+                              </p>
+                              <Button
+                                variant="outline"
+                                className="text-red-600 border-red-200 hover:bg-red-50 w-full"
+                              >
+                                Manage Bulk Delete
+                              </Button>
+                            </div>
 
-                        <div className="space-y-2 md:w-1/4">
-                          <Label>Year</Label>
-                          <Select defaultValue={selectedYear}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="2025">2025</SelectItem>
-                              <SelectItem value="2024">2024</SelectItem>
-                              <SelectItem value="2023">2023</SelectItem>
-                              <SelectItem value="2022">2022</SelectItem>
-                              <SelectItem value="2021">2021</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="space-y-2 md:w-1/4">
-                          <Label>Start Month & Year</Label>
-                          <div className="flex space-x-2">
-                            <Select defaultValue={startMonth}>
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Start Month" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="january">January</SelectItem>
-                                <SelectItem value="february">
-                                  February
-                                </SelectItem>
-                                <SelectItem value="march">March</SelectItem>
-                                <SelectItem value="april">April</SelectItem>
-                                <SelectItem value="may">May</SelectItem>
-                                <SelectItem value="june">June</SelectItem>
-                                <SelectItem value="july">July</SelectItem>
-                                <SelectItem value="august">August</SelectItem>
-                                <SelectItem value="september">
-                                  September
-                                </SelectItem>
-                                <SelectItem value="october">October</SelectItem>
-                                <SelectItem value="november">
-                                  November
-                                </SelectItem>
-                                <SelectItem value="december">
-                                  December
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Select defaultValue={startYear}>
-                              <SelectTrigger className="w-24">
-                                <SelectValue placeholder="Year" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="2025">2025</SelectItem>
-                                <SelectItem value="2024">2024</SelectItem>
-                                <SelectItem value="2023">2023</SelectItem>
-                                <SelectItem value="2022">2022</SelectItem>
-                                <SelectItem value="2021">2021</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <div className="p-4 border rounded-lg">
+                              <h3 className="font-medium text-[#0A3D62] mb-2">
+                                Recategorize
+                              </h3>
+                              <p className="text-sm text-[#0A3D62]/70 mb-3">
+                                Change categories for multiple transactions
+                              </p>
+                              <Button
+                                variant="outline"
+                                className="text-[#0A3D62] w-full"
+                              >
+                                Batch Recategorize
+                              </Button>
+                            </div>
+
+                            <div className="p-4 border rounded-lg">
+                              <h3 className="font-medium text-[#0A3D62] mb-2">
+                                Data Cleanup
+                              </h3>
+                              <p className="text-sm text-[#0A3D62]/70 mb-3">
+                                Fix duplicates and errors in your data
+                              </p>
+                              <Button
+                                variant="outline"
+                                className="text-[#0A3D62] w-full"
+                              >
+                                Run Cleanup
+                              </Button>
+                            </div>
                           </div>
                         </div>
-
-                        <div className="space-y-2 md:w-1/4">
-                          <Label>End Month & Year</Label>
-                          <div className="flex space-x-2">
-                            <Select defaultValue={endMonth}>
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="End Month" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="january">January</SelectItem>
-                                <SelectItem value="february">
-                                  February
-                                </SelectItem>
-                                <SelectItem value="march">March</SelectItem>
-                                <SelectItem value="april">April</SelectItem>
-                                <SelectItem value="may">May</SelectItem>
-                                <SelectItem value="june">June</SelectItem>
-                                <SelectItem value="july">July</SelectItem>
-                                <SelectItem value="august">August</SelectItem>
-                                <SelectItem value="september">
-                                  September
-                                </SelectItem>
-                                <SelectItem value="october">October</SelectItem>
-                                <SelectItem value="november">
-                                  November
-                                </SelectItem>
-                                <SelectItem value="december">
-                                  December
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Select defaultValue={endYear}>
-                              <SelectTrigger className="w-24">
-                                <SelectValue placeholder="Year" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="2025">2025</SelectItem>
-                                <SelectItem value="2024">2024</SelectItem>
-                                <SelectItem value="2023">2023</SelectItem>
-                                <SelectItem value="2022">2022</SelectItem>
-                                <SelectItem value="2021">2021</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    <div className="md:self-end">
-                      <Button
-                        className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 w-full"
-                        onClick={applyFilters}
-                      >
-                        Apply Filters
-                      </Button>
-                    </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </CardContent>
               </Card>
-              {/* Summary Cards from Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-[#0A3D62]/70">
-                      Total Balance
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-[#0A3D62]">
-                      {formatCurrency(42500)}
-                    </div>
-                    <p className="text-xs text-green-600 mt-1">
-                      +5.2% from last month
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-[#0A3D62]/70">
-                      Total Income
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-[#0A3D62]">
-                      {formatCurrency(43000)}
-                    </div>
-                    <p className="text-xs text-green-600 mt-1">
-                      +2.1% from last month
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-[#0A3D62]/70">
-                      Total Expense
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-[#0A3D62]">
-                      {formatCurrency(25200)}
-                    </div>
-                    <p className="text-xs text-red-600 mt-1">
-                      +8.4% from last month
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+            </TabsContent>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Income vs. Expenses vs. Loan Pie Chart */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Income vs. Expenses vs. Loan</CardTitle>
-                    <CardDescription>Monthly comparison</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-80 flex items-center justify-center">
-                      <div className="w-full flex flex-col items-center">
-                        {/* Pie Chart */}
-                        <div className="relative w-48 h-48 mb-6">
-                          <svg viewBox="0 0 100 100" className="w-full h-full">
-                            {/* Income Slice - 45% */}
-                            <path
-                              d="M 50 50 L 50 5 A 45 45 0 0 1 95 50 Z"
-                              fill="#008080"
-                            />
-                            {/* Expenses Slice - 35% */}
-                            <path
-                              d="M 50 50 L 95 50 A 45 45 0 0 1 50 95 Z"
-                              fill="#FF6F61"
-                            />
-                            {/* Loan Slice - 20% */}
-                            <path
-                              d="M 50 50 L 50 95 A 45 45 0 0 1 5 50 A 45 45 0 0 1 50 5 Z"
-                              fill="#D6A3A1"
-                            />
-                          </svg>
-                        </div>
-
-                        {/* Legend */}
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-[#008080] rounded-full mr-2"></div>
-                            <div className="flex flex-col">
-                              <span className="text-xs text-[#0A3D62] font-medium">
-                                Income
-                              </span>
-                              <span className="text-xs text-[#0A3D62]/70">
-                                {formatCurrency(43000)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-[#FF6F61] rounded-full mr-2"></div>
-                            <div className="flex flex-col">
-                              <span className="text-xs text-[#0A3D62] font-medium">
-                                Expenses
-                              </span>
-                              <span className="text-xs text-[#0A3D62]/70">
-                                {formatCurrency(25200)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-[#D6A3A1] rounded-full mr-2"></div>
-                            <div className="flex flex-col">
-                              <span className="text-xs text-[#0A3D62] font-medium">
-                                Loan
-                              </span>
-                              <span className="text-xs text-[#0A3D62]/70">
-                                {formatCurrency(12000)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Loan Status Pie Chart */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Loan Status</CardTitle>
-                    <CardDescription>Current loan breakdown</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-80 flex items-center justify-center">
-                      <div className="w-full flex flex-col items-center">
-                        {/* Pie Chart */}
-                        <div className="relative w-48 h-48 mb-6">
-                          <svg viewBox="0 0 100 100" className="w-full h-full">
-                            {/* Money Borrowed (To Be Paid) - 30% */}
-                            <path
-                              d="M 50 50 L 50 5 A 45 45 0 0 1 88.5 31.5 Z"
-                              fill="#800020"
-                            />
-                            {/* Money Lent (To Be Paid) - 25% */}
-                            <path
-                              d="M 50 50 L 88.5 31.5 A 45 45 0 0 1 88.5 68.5 Z"
-                              fill="#CC5500"
-                            />
-                            {/* Borrowed Money Paid - 20% */}
-                            <path
-                              d="M 50 50 L 88.5 68.5 A 45 45 0 0 1 50 95 Z"
-                              fill="#D6EAF8"
-                            />
-                            {/* Lent Money Paid - 25% */}
-                            <path
-                              d="M 50 50 L 50 95 A 45 45 0 0 1 11.5 68.5 A 45 45 0 0 1 11.5 31.5 A 45 45 0 0 1 50 5 Z"
-                              fill="#D6A3A1"
-                            />
-                          </svg>
-                        </div>
-
-                        {/* Legend */}
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-[#800020] rounded-full mr-2"></div>
-                            <div className="flex flex-col">
-                              <span className="text-xs text-[#0A3D62] font-medium">
-                                Money Borrowed (To Be Paid)
-                              </span>
-                              <span className="text-xs text-[#0A3D62]/70">
-                                {formatCurrency(15000)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-[#CC5500] rounded-full mr-2"></div>
-                            <div className="flex flex-col">
-                              <span className="text-xs text-[#0A3D62] font-medium">
-                                Money Lent (To Be Paid)
-                              </span>
-                              <span className="text-xs text-[#0A3D62]/70">
-                                {formatCurrency(12500)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-[#D6EAF8] rounded-full mr-2"></div>
-                            <div className="flex flex-col">
-                              <span className="text-xs text-[#0A3D62] font-medium">
-                                Borrowed Money Paid
-                              </span>
-                              <span className="text-xs text-[#0A3D62]/70">
-                                {formatCurrency(10000)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-[#D6A3A1] rounded-full mr-2"></div>
-                            <div className="flex flex-col">
-                              <span className="text-xs text-[#0A3D62] font-medium">
-                                Lent Money Paid
-                              </span>
-                              <span className="text-xs text-[#0A3D62]/70">
-                                {formatCurrency(12500)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Expense Breakdown Chart with Pie Chart */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Expense Breakdown</CardTitle>
-                    <CardDescription>
-                      Your spending by category this month
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-80 flex flex-col items-center justify-center">
-                      {/* Mock Pie Chart */}
-                      <div className="relative w-48 h-48 mb-6">
-                        <svg viewBox="0 0 100 100" className="w-full h-full">
-                          {categories.map((category, index) => {
-                            // Calculate the percentage of total spending
-                            const totalSpent = categories.reduce(
-                              (sum, cat) => sum + cat.spent,
-                              0,
-                            );
-                            const percentage =
-                              (category.spent / totalSpent) * 100;
-
-                            // Calculate the SVG parameters for the pie slice
-                            let cumulativePercentage = 0;
-                            for (let i = 0; i < index; i++) {
-                              cumulativePercentage +=
-                                (categories[i].spent / totalSpent) * 100;
-                            }
-
-                            const startAngle =
-                              (cumulativePercentage / 100) * 360;
-                            const endAngle =
-                              ((cumulativePercentage + percentage) / 100) * 360;
-
-                            // Convert angles to radians and calculate coordinates
-                            const startRad =
-                              (startAngle - 90) * (Math.PI / 180);
-                            const endRad = (endAngle - 90) * (Math.PI / 180);
-
-                            const x1 = 50 + 40 * Math.cos(startRad);
-                            const y1 = 50 + 40 * Math.sin(startRad);
-                            const x2 = 50 + 40 * Math.cos(endRad);
-                            const y2 = 50 + 40 * Math.sin(endRad);
-
-                            // Determine if the arc should be drawn as a large arc
-                            const largeArcFlag = percentage > 50 ? 1 : 0;
-
-                            return (
-                              <path
-                                key={index}
-                                d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
-                                fill={category.color}
-                              />
-                            );
-                          })}
-                        </svg>
-                      </div>
-
-                      {/* Legend */}
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                        {categories.map((category, index) => {
-                          const totalSpent = categories.reduce(
-                            (sum, cat) => sum + cat.spent,
-                            0,
-                          );
-                          const percentage = (
-                            (category.spent / totalSpent) *
-                            100
-                          ).toFixed(1);
-
-                          return (
-                            <div key={index} className="flex items-center">
-                              <div
-                                className="w-3 h-3 rounded-full mr-2"
-                                style={{ backgroundColor: category.color }}
-                              />
-                              <span className="text-xs text-[#0A3D62]">
-                                {category.name} ({percentage}%)
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Financial Insights box removed */}
-              </div>
-
-              {/* Budget Progress Gauge Charts */}
+            {/* Investments Tab */}
+            <TabsContent
+              value="investments"
+              className="space-y-6 grid grid-cols-1 gap-6"
+            >
               <Card>
-                <CardHeader>
-                  <CardTitle>Budget Progress</CardTitle>
-                  <CardDescription>Current month budget status</CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Investment Portfolio</CardTitle>
+                    <CardDescription>
+                      Track and manage your investment assets
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      className="bg-[#0A3D62] hover:bg-[#0A3D62]/80"
+                      onClick={() => setShowBudgetForm(true)}
+                    >
+                      <Plus className="h-4 w-4 mr-2" /> Add Investment
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {categories.slice(0, 4).map((category, index) => {
-                      const percentage = Math.min(
-                        100,
-                        (category.spent / category.budget) * 100,
-                      );
-                      let statusColor = "#008080"; // Green
-                      if (percentage > 90)
-                        statusColor = "#FF6F61"; // Red
-                      else if (percentage > 75) statusColor = "#CC5500"; // Yellow
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-[#f9f7f5] p-4 rounded-lg">
+                      <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
+                        Total Investments
+                      </h4>
+                      <div className="text-2xl font-bold text-[#0A3D62]">
+                        {formatCurrency(2500000)}
+                      </div>
+                    </div>
+                    <div className="bg-[#f9f7f5] p-4 rounded-lg">
+                      <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
+                        Total Returns
+                      </h4>
+                      <div className="text-2xl font-bold text-green-600">
+                        +{formatCurrency(320000)}
+                      </div>
+                    </div>
+                    <div className="bg-[#f9f7f5] p-4 rounded-lg">
+                      <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
+                        ROI
+                      </h4>
+                      <div className="text-2xl font-bold text-green-600">
+                        +12.8%
+                      </div>
+                    </div>
+                  </div>
 
-                      return (
-                        <div key={index} className="text-center">
-                          <div className="relative inline-block w-32 h-32">
-                            {/* Background circle */}
-                            <svg
-                              className="w-full h-full"
-                              viewBox="0 0 100 100"
-                            >
-                              <circle
-                                cx="50"
-                                cy="50"
-                                r="45"
-                                fill="none"
-                                stroke="#e5e7eb"
-                                strokeWidth="10"
-                              />
-
-                              {/* Progress circle */}
-                              <circle
-                                cx="50"
-                                cy="50"
-                                r="45"
-                                fill="none"
-                                stroke={statusColor}
-                                strokeWidth="10"
-                                strokeDasharray={`${(2 * Math.PI * 45 * percentage) / 100} ${2 * Math.PI * 45}`}
-                                strokeDashoffset="0"
-                                transform="rotate(-90 50 50)"
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span className="text-2xl font-bold text-[#0A3D62]">
-                                {Math.round(percentage)}%
-                              </span>
-                              <span className="text-xs text-[#0A3D62]/70">
-                                {category.name}
-                              </span>
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Real Estate</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="p-4 border rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="font-medium text-[#0A3D62]">
+                                Condominium Unit - Makati
+                              </h3>
+                              <div className="text-sm font-medium text-[#0A3D62]">
+                                {formatCurrency(1800000)}
+                              </div>
+                            </div>
+                            <div className="flex justify-between text-sm text-[#0A3D62]/70 mb-2">
+                              <span>Purchase: {formatCurrency(1500000)}</span>
+                              <span>Appreciation: +20%</span>
+                            </div>
+                            <div className="flex space-x-2 mt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2 text-[#0A3D62]"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2 text-[#0A3D62]"
+                              >
+                                Details
+                              </Button>
                             </div>
                           </div>
-                          <p className="mt-2 text-sm font-medium text-[#0A3D62]">
-                            {formatCurrency(category.spent)} /{" "}
-                            {formatCurrency(category.budget)}
-                          </p>
+
+                          <div className="p-4 border rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="font-medium text-[#0A3D62]">
+                                Lot - Cavite
+                              </h3>
+                              <div className="text-sm font-medium text-[#0A3D62]">
+                                {formatCurrency(500000)}
+                              </div>
+                            </div>
+                            <div className="flex justify-between text-sm text-[#0A3D62]/70 mb-2">
+                              <span>Purchase: {formatCurrency(350000)}</span>
+                              <span>Appreciation: +42.8%</span>
+                            </div>
+                            <div className="flex space-x-2 mt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2 text-[#0A3D62]"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2 text-[#0A3D62]"
+                              >
+                                Details
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                      );
-                    })}
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Stocks</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="p-4 border rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="font-medium text-[#0A3D62]">
+                                ACEN (AC Energy)
+                              </h3>
+                              <div className="text-sm font-medium text-green-600">
+                                {formatCurrency(120000)}
+                              </div>
+                            </div>
+                            <div className="flex justify-between text-sm text-[#0A3D62]/70 mb-2">
+                              <span>Shares: 10,000</span>
+                              <span>Current: ₱12.00</span>
+                              <span>Avg. Cost: ₱10.50</span>
+                              <span>Gain: +14.3%</span>
+                            </div>
+                            <div className="flex space-x-2 mt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2 text-[#0A3D62]"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2 text-[#0A3D62]"
+                              >
+                                Details
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="p-4 border rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="font-medium text-[#0A3D62]">
+                                SM (SM Investments)
+                              </h3>
+                              <div className="text-sm font-medium text-red-600">
+                                {formatCurrency(80000)}
+                              </div>
+                            </div>
+                            <div className="flex justify-between text-sm text-[#0A3D62]/70 mb-2">
+                              <span>Shares: 800</span>
+                              <span>Current: ₱100.00</span>
+                              <span>Avg. Cost: ₱105.50</span>
+                              <span>Loss: -5.2%</span>
+                            </div>
+                            <div className="flex space-x-2 mt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2 text-[#0A3D62]"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2 text-[#0A3D62]"
+                              >
+                                Details
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Insights Tab */}
+            <TabsContent
+              value="insights"
+              className="space-y-6 grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              <Card className="col-span-2">
+                <CardHeader>
+                  <CardTitle>Monthly Overview</CardTitle>
+                  <CardDescription>
+                    Your financial activity for{" "}
+                    {selectedMonth.charAt(0).toUpperCase() +
+                      selectedMonth.slice(1)}{" "}
+                    {selectedYear}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {/* Insights Filters */}
+                  <Card className="mb-6">
+                    <CardHeader>
+                      <CardTitle>Insights Filters</CardTitle>
+                      <CardDescription>
+                        Customize your insights view
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <div className="space-y-2 md:w-1/4">
+                          <Label>View Type</Label>
+                          <Select
+                            defaultValue="single"
+                            onValueChange={(value) => setFilterType(value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select view type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="single">
+                                Single Month
+                              </SelectItem>
+                              <SelectItem value="range">Month Range</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {filterType === "single" ? (
+                          <>
+                            <div className="space-y-2 md:w-1/4">
+                              <Label>Month</Label>
+                              <Select
+                                defaultValue={selectedMonth}
+                                value={selectedMonth}
+                                onValueChange={setSelectedMonth}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select month" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="january">
+                                    January
+                                  </SelectItem>
+                                  <SelectItem value="february">
+                                    February
+                                  </SelectItem>
+                                  <SelectItem value="march">March</SelectItem>
+                                  <SelectItem value="april">April</SelectItem>
+                                  <SelectItem value="may">May</SelectItem>
+                                  <SelectItem value="june">June</SelectItem>
+                                  <SelectItem value="july">July</SelectItem>
+                                  <SelectItem value="august">August</SelectItem>
+                                  <SelectItem value="september">
+                                    September
+                                  </SelectItem>
+                                  <SelectItem value="october">
+                                    October
+                                  </SelectItem>
+                                  <SelectItem value="november">
+                                    November
+                                  </SelectItem>
+                                  <SelectItem value="december">
+                                    December
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2 md:w-1/4">
+                              <Label>Year</Label>
+                              <Select
+                                defaultValue={selectedYear}
+                                value={selectedYear}
+                                onValueChange={setSelectedYear}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select year" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="2025">2025</SelectItem>
+                                  <SelectItem value="2024">2024</SelectItem>
+                                  <SelectItem value="2023">2023</SelectItem>
+                                  <SelectItem value="2022">2022</SelectItem>
+                                  <SelectItem value="2021">2021</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="space-y-2 md:w-1/4">
+                              <Label>Start Month & Year</Label>
+                              <div className="flex space-x-2">
+                                <Select
+                                  defaultValue={startMonth}
+                                  value={startMonth}
+                                  onValueChange={setStartMonth}
+                                >
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Start Month" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="january">
+                                      January
+                                    </SelectItem>
+                                    <SelectItem value="february">
+                                      February
+                                    </SelectItem>
+                                    <SelectItem value="march">March</SelectItem>
+                                    <SelectItem value="april">April</SelectItem>
+                                    <SelectItem value="may">May</SelectItem>
+                                    <SelectItem value="june">June</SelectItem>
+                                    <SelectItem value="july">July</SelectItem>
+                                    <SelectItem value="august">
+                                      August
+                                    </SelectItem>
+                                    <SelectItem value="september">
+                                      September
+                                    </SelectItem>
+                                    <SelectItem value="october">
+                                      October
+                                    </SelectItem>
+                                    <SelectItem value="november">
+                                      November
+                                    </SelectItem>
+                                    <SelectItem value="december">
+                                      December
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Select
+                                  defaultValue={startYear}
+                                  value={startYear}
+                                  onValueChange={setStartYear}
+                                >
+                                  <SelectTrigger className="w-24">
+                                    <SelectValue placeholder="Year" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="2025">2025</SelectItem>
+                                    <SelectItem value="2024">2024</SelectItem>
+                                    <SelectItem value="2023">2023</SelectItem>
+                                    <SelectItem value="2022">2022</SelectItem>
+                                    <SelectItem value="2021">2021</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2 md:w-1/4">
+                              <Label>End Month & Year</Label>
+                              <div className="flex space-x-2">
+                                <Select
+                                  defaultValue={endMonth}
+                                  value={endMonth}
+                                  onValueChange={setEndMonth}
+                                >
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="End Month" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="january">
+                                      January
+                                    </SelectItem>
+                                    <SelectItem value="february">
+                                      February
+                                    </SelectItem>
+                                    <SelectItem value="march">March</SelectItem>
+                                    <SelectItem value="april">April</SelectItem>
+                                    <SelectItem value="may">May</SelectItem>
+                                    <SelectItem value="june">June</SelectItem>
+                                    <SelectItem value="july">July</SelectItem>
+                                    <SelectItem value="august">
+                                      August
+                                    </SelectItem>
+                                    <SelectItem value="september">
+                                      September
+                                    </SelectItem>
+                                    <SelectItem value="october">
+                                      October
+                                    </SelectItem>
+                                    <SelectItem value="november">
+                                      November
+                                    </SelectItem>
+                                    <SelectItem value="december">
+                                      December
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Select
+                                  defaultValue={endYear}
+                                  value={endYear}
+                                  onValueChange={setEndYear}
+                                >
+                                  <SelectTrigger className="w-24">
+                                    <SelectValue placeholder="Year" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="2025">2025</SelectItem>
+                                    <SelectItem value="2024">2024</SelectItem>
+                                    <SelectItem value="2023">2023</SelectItem>
+                                    <SelectItem value="2022">2022</SelectItem>
+                                    <SelectItem value="2021">2021</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        <div className="space-y-2 md:w-1/4">
+                          <Label>Category</Label>
+                          <Select
+                            defaultValue="all"
+                            value={selectedCategory}
+                            onValueChange={setSelectedCategory}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">
+                                All Categories
+                              </SelectItem>
+                              <SelectItem value="food">Food</SelectItem>
+                              <SelectItem value="transportation">
+                                Transportation
+                              </SelectItem>
+                              <SelectItem value="utilities">
+                                Utilities
+                              </SelectItem>
+                              <SelectItem value="entertainment">
+                                Entertainment
+                              </SelectItem>
+                              <SelectItem value="shopping">Shopping</SelectItem>
+                              <SelectItem value="house">House</SelectItem>
+                              <SelectItem value="income">Income</SelectItem>
+                              <SelectItem value="expense">Expense</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="md:self-end">
+                          <Button
+                            className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 w-full"
+                            onClick={applyFilters}
+                          >
+                            Apply Filters
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-[#f9f7f5] p-4 rounded-lg">
+                      <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
+                        Total Income
+                      </h4>
+                      <div className="text-2xl font-bold text-green-600">
+                        {formatCurrency(
+                          filteredTransactions
+                            .filter((t) => t.amount > 0)
+                            .reduce((sum, t) => sum + t.amount, 0),
+                        )}
+                      </div>
+                    </div>
+                    <div className="bg-[#f9f7f5] p-4 rounded-lg">
+                      <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
+                        Total Expenses
+                      </h4>
+                      <div className="text-2xl font-bold text-red-600">
+                        {formatCurrency(
+                          filteredTransactions
+                            .filter((t) => t.amount < 0)
+                            .reduce((sum, t) => sum + t.amount, 0),
+                        )}
+                      </div>
+                    </div>
+                    <div className="bg-[#f9f7f5] p-4 rounded-lg">
+                      <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
+                        Net Savings
+                      </h4>
+                      <div
+                        className={`text-2xl font-bold ${filteredTransactions.reduce((sum, t) => sum + t.amount, 0) >= 0 ? "text-green-600" : "text-red-600"}`}
+                      >
+                        {formatCurrency(
+                          filteredTransactions.reduce(
+                            (sum, t) => sum + t.amount,
+                            0,
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-medium text-[#0A3D62] mb-4">
+                        Spending by Category
+                      </h3>
+                      <div className="space-y-4">
+                        {categories.map((category) => (
+                          <div key={category.name} className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center">
+                                <div
+                                  className="w-3 h-3 rounded-full mr-2"
+                                  style={{ backgroundColor: category.color }}
+                                />
+                                <span className="text-sm font-medium">
+                                  {category.name}
+                                </span>
+                              </div>
+                              <span
+                                className={
+                                  category.spent > category.budget
+                                    ? "text-red-600 text-sm font-medium"
+                                    : "text-[#0A3D62] text-sm font-medium"
+                                }
+                              >
+                                {formatCurrency(category.spent)}
+                              </span>
+                            </div>
+                            <Progress
+                              value={(category.spent / category.budget) * 100}
+                              className="h-2 bg-gray-200"
+                              indicatorClassName={`${category.spent > category.budget ? "bg-red-500" : "bg-[#0A3D62]"}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Recent Transactions box removed */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Transactions</CardTitle>
+                  <CardDescription>
+                    Your latest financial activities
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {filteredTransactions.slice(0, 5).map((transaction) => (
+                      <div
+                        key={transaction.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div>
+                          <p className="font-medium text-[#0A3D62]">
+                            {transaction.description}
+                          </p>
+                          <p className="text-xs text-[#0A3D62]/70">
+                            {new Date(transaction.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span
+                          className={`font-medium ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}
+                        >
+                          {transaction.amount > 0 ? "+" : ""}
+                          {formatCurrency(transaction.amount)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-              {/* AI Assistant */}
-              <div className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Ask AI Assistant</CardTitle>
-                    <CardDescription>
-                      Get personalized financial advice and insights
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Financial Health Score</CardTitle>
+                  <CardDescription>
+                    Based on your spending habits and savings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <div className="relative w-40 h-40 mb-4">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-4xl font-bold text-[#0A3D62]">
+                          78
+                        </div>
+                      </div>
+                      <svg
+                        className="w-full h-full"
+                        viewBox="0 0 100 100"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          fill="none"
+                          stroke="#e2e8f0"
+                          strokeWidth="10"
+                        />
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          fill="none"
+                          stroke="#0A3D62"
+                          strokeWidth="10"
+                          strokeDasharray="282.7"
+                          strokeDashoffset="62.2"
+                          transform="rotate(-90 50 50)"
+                        />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-lg font-medium text-[#0A3D62]">
+                        Good
+                      </h3>
+                      <p className="text-sm text-[#0A3D62]/70 mt-1">
+                        You're on track to meet your financial goals
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Savings Rate</span>
+                      <span className="text-sm font-medium text-green-600">
+                        18%
+                      </span>
+                    </div>
+                    <Progress
+                      value={18}
+                      className="h-2 bg-gray-200"
+                      indicatorClassName="bg-green-600"
+                    />
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">
+                        Debt-to-Income
+                      </span>
+                      <span className="text-sm font-medium text-yellow-600">
+                        32%
+                      </span>
+                    </div>
+                    <Progress
+                      value={32}
+                      className="h-2 bg-gray-200"
+                      indicatorClassName="bg-yellow-600"
+                    />
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">
+                        Budget Adherence
+                      </span>
+                      <span className="text-sm font-medium text-[#0A3D62]">
+                        85%
+                      </span>
+                    </div>
+                    <Progress
+                      value={85}
+                      className="h-2 bg-gray-200"
+                      indicatorClassName="bg-[#0A3D62]"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="col-span-2">
+                <CardHeader>
+                  <CardTitle>AI-Powered Insights</CardTitle>
+                  <CardDescription>
+                    Personalized financial recommendations
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-[#0A3D62]/5 rounded-lg border border-[#0A3D62]/10">
+                      <div className="flex items-start">
+                        <div className="bg-[#0A3D62] text-white p-2 rounded-full mr-3">
+                          <MessageSquare className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-[#0A3D62] mb-1">
+                            Spending Pattern Detected
+                          </h4>
+                          <p className="text-sm text-[#0A3D62]/70">
+                            You've spent 24% more on dining out this month
+                            compared to your 3-month average. Consider setting a
+                            specific budget for restaurants to keep your
+                            spending in check.
+                          </p>
+                          <div className="mt-3 flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-8 border-[#0A3D62] text-[#0A3D62]"
+                            >
+                              Create Budget
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-8 border-gray-200 text-gray-500"
+                            >
+                              Dismiss
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                      <div className="flex items-start">
+                        <div className="bg-green-600 text-white p-2 rounded-full mr-3">
+                          <Target className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-green-800 mb-1">
+                            Savings Goal Progress
+                          </h4>
+                          <p className="text-sm text-green-700">
+                            You're 65% of the way to your emergency fund goal.
+                            At your current savings rate, you'll reach your
+                            target in approximately 4 months.
+                          </p>
+                          <div className="mt-2">
+                            <div className="flex justify-between items-center text-xs text-green-700 mb-1">
+                              <span>₱65,000 saved</span>
+                              <span>₱100,000 goal</span>
+                            </div>
+                            <Progress
+                              value={65}
+                              className="h-2 bg-green-100"
+                              indicatorClassName="bg-green-600"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <div className="flex items-start">
+                        <div className="bg-blue-600 text-white p-2 rounded-full mr-3">
+                          <Calendar className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-blue-800 mb-1">
+                            Upcoming Bill Reminder
+                          </h4>
+                          <p className="text-sm text-blue-700">
+                            Your electricity bill (approximately ₱4,500 based on
+                            previous months) is due in 5 days. Make sure you
+                            have sufficient funds in your account.
+                          </p>
+                          <div className="mt-3 flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-8 border-blue-300 text-blue-700"
+                            >
+                              Schedule Payment
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs h-8 border-gray-200 text-gray-500"
+                            >
+                              Remind Me Later
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <div className="relative">
                       <Input
-                        placeholder="Ask a question about your finances..."
-                        className="flex-grow"
+                        placeholder="Ask Fintr about your finances..."
+                        className="pr-12"
                       />
-                      <Button className="bg-[#0A3D62] hover:bg-[#0A3D62]/80">
-                        Ask
+                      <Button
+                        size="sm"
+                        className="absolute right-1 top-1 h-8 w-10 bg-[#0A3D62] hover:bg-[#0A3D62]/80"
+                      >
+                        <Send className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="mt-2 text-xs text-[#0A3D62]/70">
-                      Try: "How much did I spend on food last month?" or "What's
-                      my biggest expense category?"
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>

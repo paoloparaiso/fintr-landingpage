@@ -214,7 +214,11 @@ const AddTransactionDialog = ({
                   className="w-full justify-start text-left font-normal mt-1"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  {date ? (
+                    format(date, "MMMM d, yyyy")
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -293,7 +297,7 @@ const AddTransactionDialog = ({
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="expense-payment-method">Payment Method</Label>
+                <Label htmlFor="expense-payment-method">Account</Label>
                 <Select
                   value={expenseForm.paymentMethod}
                   onValueChange={(value) =>
@@ -301,7 +305,7 @@ const AddTransactionDialog = ({
                   }
                 >
                   <SelectTrigger id="expense-payment-method">
-                    <SelectValue placeholder="Select payment method" />
+                    <SelectValue placeholder="Select Account" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="cash">Cash</SelectItem>
@@ -554,7 +558,7 @@ const AddTransactionDialog = ({
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {loanForm.dueDate ? (
-                        format(loanForm.dueDate, "PPP")
+                        format(loanForm.dueDate, "MMMM d, yyyy")
                       ) : (
                         <span>Pick a date</span>
                       )}

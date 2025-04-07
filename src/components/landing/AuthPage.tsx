@@ -8,9 +8,15 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 
 interface AuthPageProps {
   onBack?: () => void;
+  isLogin?: boolean;
+  authToggle?: React.ReactNode;
 }
 
-const AuthPage = ({ onBack = () => {} }: AuthPageProps) => {
+const AuthPage = ({
+  onBack = () => {},
+  isLogin = true,
+  authToggle,
+}: AuthPageProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -21,7 +27,12 @@ const AuthPage = ({ onBack = () => {} }: AuthPageProps) => {
     firstName: "",
     lastName: "",
   });
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLoginState, setIsLoginState] = useState(isLogin);
+
+  // Update internal state when prop changes
+  React.useEffect(() => {
+    setIsLoginState(isLogin);
+  }, [isLogin]);
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -78,8 +89,8 @@ const AuthPage = ({ onBack = () => {} }: AuthPageProps) => {
         title: "Registration successful",
         description: "Your account has been created. Welcome to Fintr!",
       });
-      // Redirect to dashboard
-      window.location.href = "/dashboard";
+      // Redirect to account setup instead of waitlist survey
+      window.location.href = "/account-setup";
     } catch (error) {
       toast({
         title: "Registration failed",
@@ -179,7 +190,9 @@ const AuthPage = ({ onBack = () => {} }: AuthPageProps) => {
         </div>
       </div>
 
-      {isLogin ? (
+      {authToggle && <div className="mb-6">{authToggle}</div>}
+
+      {isLoginState ? (
         <div>
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -226,7 +239,7 @@ const AuthPage = ({ onBack = () => {} }: AuthPageProps) => {
             <p className="text-center text-sm text-[#0A3D62]/70 mt-4">
               Don't have an account?{" "}
               <button
-                onClick={() => setIsLogin(false)}
+                onClick={() => setIsLoginState(false)}
                 className="text-[#0A3D62] font-medium hover:underline"
               >
                 Sign Up
@@ -314,7 +327,7 @@ const AuthPage = ({ onBack = () => {} }: AuthPageProps) => {
             <p className="text-center text-sm text-[#0A3D62]/70 mt-4">
               Already have an account?{" "}
               <button
-                onClick={() => setIsLogin(true)}
+                onClick={() => setIsLoginState(true)}
                 className="text-[#0A3D62] font-medium hover:underline"
               >
                 Sign In

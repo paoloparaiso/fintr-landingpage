@@ -12,7 +12,7 @@ const Pricing = ({
   subtitle = "Simple, transparent pricing for everyone",
 }: PricingProps) => {
   return (
-    <section id="pricing" className="py-16 md:py-24 bg-[#FAF9F6]">
+    <section id="pricing" className="py-16 md:py-24 bg-[#F7F2E7]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#0A3D62]">
@@ -124,18 +124,6 @@ const Pricing = ({
                     </li>
                   </ul>
                 </div>
-              </div>
-
-              <div className="mt-8 text-center">
-                <Button
-                  className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white rounded-md px-8 py-3 text-lg"
-                  onClick={() => (window.location.href = "/auth")}
-                >
-                  Try Fintr
-                </Button>
-                <p className="mt-4 text-sm text-[#0A3D62]/70">
-                  No credit card required. Get notified when we launch.
-                </p>
               </div>
             </div>
           </div>

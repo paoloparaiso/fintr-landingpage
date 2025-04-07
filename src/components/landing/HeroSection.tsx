@@ -43,9 +43,10 @@ const HeroSection = ({
 
             <div className="w-full max-w-md mx-auto">
               <WaitlistForm
-                buttonText="Join the Waitlist"
+                buttonText="Join the Waitlist for Early Access"
                 placeholderText="Enter your email address"
                 className="shadow-none"
+                redirectTo="/waitlist"
               />
             </div>
           </motion.div>

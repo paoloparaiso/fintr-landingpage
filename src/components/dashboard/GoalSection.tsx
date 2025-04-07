@@ -31,6 +31,8 @@ import { Calendar } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { format } from "date-fns";
 import { CalendarIcon, Plus, Target, ArrowRight } from "lucide-react";
+import { useToast } from "../ui/use-toast";
+import { toast } from "../ui/use-toast";
 
 interface GoalSectionProps {
   formatCurrency: (amount: number) => string;
@@ -47,6 +49,9 @@ const GoalSection = ({ formatCurrency }: GoalSectionProps) => {
   const [goalMonthlyContribution, setGoalMonthlyContribution] = useState("");
   const [goalPriority, setGoalPriority] = useState("medium");
   const [goalNotes, setGoalNotes] = useState("");
+  const [financialFreedomDefinition, setFinancialFreedomDefinition] = useState(
+    "Having enough passive income to cover my expenses and being able to travel 3 months a year.",
+  );
 
   // Mock goals data with state
   const [goals, setGoals] = useState([
@@ -103,238 +108,281 @@ const GoalSection = ({ formatCurrency }: GoalSectionProps) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="grid grid-cols-1 gap-6">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Financial Goals</CardTitle>
-            <CardDescription>
-              Track and manage your financial goals
-            </CardDescription>
-          </div>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-[#0A3D62] hover:bg-[#0A3D62]/80">
-                <Plus className="h-4 w-4 mr-2" /> Add Goal
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-              <DialogHeader>
-                <DialogTitle>Create New Financial Goal</DialogTitle>
-                <DialogDescription>
-                  Set up a new financial goal to track your progress
-                </DialogDescription>
-              </DialogHeader>
+        <CardHeader>
+          <div className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Financial Goals</CardTitle>
+              <CardDescription>
+                Track and manage your financial goals
+              </CardDescription>
+            </div>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-[#0A3D62] hover:bg-[#0A3D62]/80">
+                  <Plus className="h-4 w-4 mr-2" /> Add Goal
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                  <DialogTitle>Create New Financial Goal</DialogTitle>
+                  <DialogDescription>
+                    Set up a new financial goal to track your progress
+                  </DialogDescription>
+                </DialogHeader>
 
-              <Tabs
-                defaultValue="short-term"
-                value={goalType}
-                onValueChange={setGoalType}
-                className="w-full mt-4"
-              >
-                <TabsList className="grid grid-cols-3 w-full">
-                  <TabsTrigger value="short-term">Short-term</TabsTrigger>
-                  <TabsTrigger value="medium-term">Medium-term</TabsTrigger>
-                  <TabsTrigger value="long-term">Long-term</TabsTrigger>
-                </TabsList>
+                <Tabs
+                  defaultValue="short-term"
+                  value={goalType}
+                  onValueChange={setGoalType}
+                  className="w-full mt-4"
+                >
+                  <TabsList className="grid grid-cols-3 w-full">
+                    <TabsTrigger value="short-term">Short-term</TabsTrigger>
+                    <TabsTrigger value="medium-term">Medium-term</TabsTrigger>
+                    <TabsTrigger value="long-term">Long-term</TabsTrigger>
+                  </TabsList>
 
-                <div className="space-y-4 mt-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="goal-name">Goal Name</Label>
-                      <Input
-                        id="goal-name"
-                        placeholder="e.g., Emergency Fund"
-                      />
+                  <div className="space-y-4 mt-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="goal-name">Goal Name</Label>
+                        <Input
+                          id="goal-name"
+                          placeholder="e.g., Emergency Fund"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="goal-category">Category</Label>
+                        <Select defaultValue="emergency">
+                          <SelectTrigger id="goal-category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="emergency">
+                              Emergency Fund
+                            </SelectItem>
+                            <SelectItem value="debt">Debt Payoff</SelectItem>
+                            <SelectItem value="retirement">
+                              Retirement
+                            </SelectItem>
+                            <SelectItem value="education">Education</SelectItem>
+                            <SelectItem value="travel">Travel</SelectItem>
+                            <SelectItem value="home">Home Purchase</SelectItem>
+                            <SelectItem value="vehicle">Vehicle</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="target-amount">Target Amount</Label>
+                        <Input
+                          id="target-amount"
+                          type="number"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="current-amount">Current Amount</Label>
+                        <Input
+                          id="current-amount"
+                          type="number"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="monthly-contribution">
+                          Monthly Contribution
+                        </Label>
+                        <Input
+                          id="monthly-contribution"
+                          type="number"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Target Date</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start text-left font-normal"
+                            >
+                              {targetDate ? (
+                                format(targetDate, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={targetDate}
+                              onSelect={setTargetDate}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="goal-category">Category</Label>
-                      <Select defaultValue="emergency">
-                        <SelectTrigger id="goal-category">
-                          <SelectValue placeholder="Select category" />
+                      <Label htmlFor="goal-priority">Priority</Label>
+                      <Select defaultValue="medium">
+                        <SelectTrigger id="goal-priority">
+                          <SelectValue placeholder="Select priority" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="emergency">
-                            Emergency Fund
-                          </SelectItem>
-                          <SelectItem value="debt">Debt Payoff</SelectItem>
-                          <SelectItem value="retirement">Retirement</SelectItem>
-                          <SelectItem value="education">Education</SelectItem>
-                          <SelectItem value="travel">Travel</SelectItem>
-                          <SelectItem value="home">Home Purchase</SelectItem>
-                          <SelectItem value="vehicle">Vehicle</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="low">Low</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="target-amount">Target Amount</Label>
+                      <Label htmlFor="goal-notes">Notes</Label>
                       <Input
-                        id="target-amount"
-                        type="number"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="current-amount">Current Amount</Label>
-                      <Input
-                        id="current-amount"
-                        type="number"
-                        placeholder="0.00"
+                        id="goal-notes"
+                        placeholder="Additional details about your goal"
                       />
                     </div>
                   </div>
+                </Tabs>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="monthly-contribution">
-                        Monthly Contribution
-                      </Label>
-                      <Input
-                        id="monthly-contribution"
-                        type="number"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Target Date</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal"
-                          >
-                            {targetDate ? (
-                              format(targetDate, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={targetDate}
-                            onSelect={setTargetDate}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </div>
+                <DialogFooter className="mt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setOpen(false);
+                      setEditingGoalIndex(null);
+                      setGoalName("");
+                      setGoalTargetAmount("");
+                      setGoalCurrentAmount("");
+                      setGoalMonthlyContribution("");
+                      setGoalPriority("medium");
+                      setGoalNotes("");
+                    }}
+                    className="mr-2"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-[#0A3D62] hover:bg-[#0A3D62]/80"
+                    onClick={() => {
+                      // Create a new goal object
+                      const newGoal = {
+                        id:
+                          editingGoalIndex !== null
+                            ? goals[editingGoalIndex].id
+                            : goals.length + 1,
+                        name: goalName || "New Goal",
+                        targetAmount: parseFloat(goalTargetAmount) || 100000,
+                        currentAmount: parseFloat(goalCurrentAmount) || 0,
+                        targetDate: targetDate
+                          ? targetDate.toISOString().split("T")[0]
+                          : new Date().toISOString().split("T")[0],
+                        category: goalType,
+                        priority: goalPriority,
+                        monthlyContribution:
+                          parseFloat(goalMonthlyContribution) || 5000,
+                        notes: goalNotes,
+                      };
 
-                  <div className="space-y-2">
-                    <Label htmlFor="goal-priority">Priority</Label>
-                    <Select defaultValue="medium">
-                      <SelectTrigger id="goal-priority">
-                        <SelectValue placeholder="Select priority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="goal-notes">Notes</Label>
-                    <Input
-                      id="goal-notes"
-                      placeholder="Additional details about your goal"
-                    />
-                  </div>
-                </div>
-              </Tabs>
-
-              <DialogFooter className="mt-6">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setOpen(false);
-                    setEditingGoalIndex(null);
-                    setGoalName("");
-                    setGoalTargetAmount("");
-                    setGoalCurrentAmount("");
-                    setGoalMonthlyContribution("");
-                    setGoalPriority("medium");
-                    setGoalNotes("");
-                  }}
-                  className="mr-2"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="bg-[#0A3D62] hover:bg-[#0A3D62]/80"
-                  onClick={() => {
-                    // Create a new goal object
-                    const newGoal = {
-                      id:
-                        editingGoalIndex !== null
-                          ? goals[editingGoalIndex].id
-                          : goals.length + 1,
-                      name: goalName || "New Goal",
-                      targetAmount: parseFloat(goalTargetAmount) || 100000,
-                      currentAmount: parseFloat(goalCurrentAmount) || 0,
-                      targetDate: targetDate
-                        ? targetDate.toISOString().split("T")[0]
-                        : new Date().toISOString().split("T")[0],
-                      category: goalType,
-                      priority: goalPriority,
-                      monthlyContribution:
-                        parseFloat(goalMonthlyContribution) || 5000,
-                      notes: goalNotes,
-                    };
-
-                    if (editingGoalIndex !== null) {
-                      // Update existing goal
-                      const updatedGoals = [...goals];
-                      updatedGoals[editingGoalIndex] = newGoal;
-                      setGoals(updatedGoals);
-                    } else {
-                      // Check if goal with same name exists
-                      const existingGoalIndex = goals.findIndex(
-                        (g) =>
-                          g.name.toLowerCase() === newGoal.name.toLowerCase(),
-                      );
-
-                      if (existingGoalIndex >= 0) {
+                      if (editingGoalIndex !== null) {
                         // Update existing goal
                         const updatedGoals = [...goals];
-                        updatedGoals[existingGoalIndex] = {
-                          ...updatedGoals[existingGoalIndex],
-                          ...newGoal,
-                          id: updatedGoals[existingGoalIndex].id, // Keep original ID
-                        };
+                        updatedGoals[editingGoalIndex] = newGoal;
                         setGoals(updatedGoals);
                       } else {
-                        // Add new goal
-                        setGoals([...goals, newGoal]);
-                      }
-                    }
+                        // Check if goal with same name exists
+                        const existingGoalIndex = goals.findIndex(
+                          (g) =>
+                            g.name.toLowerCase() === newGoal.name.toLowerCase(),
+                        );
 
-                    // Reset form and close dialog
-                    setOpen(false);
-                    setEditingGoalIndex(null);
-                    setGoalName("");
-                    setGoalTargetAmount("");
-                    setGoalCurrentAmount("");
-                    setGoalMonthlyContribution("");
-                    setGoalPriority("medium");
-                    setGoalNotes("");
-                  }}
-                >
-                  {editingGoalIndex !== null ? "Update Goal" : "Create Goal"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                        if (existingGoalIndex >= 0) {
+                          // Update existing goal
+                          const updatedGoals = [...goals];
+                          updatedGoals[existingGoalIndex] = {
+                            ...updatedGoals[existingGoalIndex],
+                            ...newGoal,
+                            id: updatedGoals[existingGoalIndex].id, // Keep original ID
+                          };
+                          setGoals(updatedGoals);
+                        } else {
+                          // Add new goal
+                          setGoals([...goals, newGoal]);
+                        }
+                      }
+
+                      // Reset form and close dialog
+                      setOpen(false);
+                      setEditingGoalIndex(null);
+                      setGoalName("");
+                      setGoalTargetAmount("");
+                      setGoalCurrentAmount("");
+                      setGoalMonthlyContribution("");
+                      setGoalPriority("medium");
+                      setGoalNotes("");
+                    }}
+                  >
+                    {editingGoalIndex !== null ? "Update Goal" : "Create Goal"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
+          <Card className="mb-6 bg-[#f9f7f5]/50 border-[#0A3D62]/10">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">
+                What's your own version of Financial Freedom?
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="financialFreedomDefinition"></Label>
+                <div className="relative">
+                  <textarea
+                    id="financialFreedomDefinition"
+                    value={financialFreedomDefinition}
+                    onChange={(e) =>
+                      setFinancialFreedomDefinition(e.target.value)
+                    }
+                    className="w-full min-h-[60px] p-3 pr-12 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A3D62] focus:border-transparent"
+                    placeholder="Describe what financial freedom means to you personally"
+                    rows={2}
+                  />
+                  <Button
+                    className="absolute right-3 bottom-3 bg-[#0A3D62] hover:bg-[#0A3D62]/80 rounded-full p-2 h-8 w-8"
+                    size="icon"
+                    onClick={() => {
+                      // This would normally save to a database
+                      toast({
+                        title: "Definition Updated",
+                        description:
+                          "Your financial freedom definition has been updated.",
+                      });
+                    }}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Goal Summary */}
           <Card className="mb-6">
             <CardHeader>
@@ -344,7 +392,7 @@ const GoalSection = ({ formatCurrency }: GoalSectionProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-[#f9f7f5] p-4 rounded-lg">
                   <h4 className="text-sm font-medium text-[#0A3D62]/70 mb-1">
                     Total Goal Amount
@@ -383,7 +431,7 @@ const GoalSection = ({ formatCurrency }: GoalSectionProps) => {
             </CardContent>
           </Card>
 
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-6">
             {goals.map((goal, index) => (
               <div key={goal.id} className="border rounded-lg p-4">
                 <div className="flex justify-between items-start mb-2">

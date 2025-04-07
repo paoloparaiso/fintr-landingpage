@@ -10,6 +10,7 @@ interface WaitlistFormProps {
   buttonText?: string;
   placeholderText?: string;
   className?: string;
+  redirectTo?: string;
 }
 
 const WaitlistForm = ({
@@ -21,6 +22,7 @@ const WaitlistForm = ({
   buttonText = "Join Waitlist",
   placeholderText = "Enter your email",
   className = "",
+  redirectTo = "/auth",
 }: WaitlistFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -30,8 +32,8 @@ const WaitlistForm = ({
     setIsSubmitting(true);
 
     try {
-      // Redirect to waitlist page directly
-      window.location.href = "/waitlist";
+      // Redirect to specified page
+      window.location.href = redirectTo;
     } catch (error) {
       toast({
         title: "Error",
@@ -47,7 +49,7 @@ const WaitlistForm = ({
       <Button
         onClick={handleSubmit}
         disabled={isSubmitting}
-        className="w-full h-12 px-6 bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white font-medium transition-colors rounded-md"
+        className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white rounded-md px-6 py-2"
       >
         {isSubmitting ? (
           <Loader2 className="h-4 w-4 animate-spin" />

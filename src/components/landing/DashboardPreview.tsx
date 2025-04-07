@@ -63,14 +63,7 @@ const DashboardPreview = ({
                   className="h-8 w-auto"
                 />
               </div>
-              <div className="flex items-center space-x-4">
-                <Button
-                  className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white rounded-md px-6 py-2"
-                  onClick={() => (window.location.href = "/auth")}
-                >
-                  Try It Now
-                </Button>
-              </div>
+              {/* 'Try It Now' button removed */}
             </div>
           </div>
 
@@ -311,7 +304,43 @@ const DashboardPreview = ({
             <div className="mt-8 text-center">
               <Button
                 className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white px-6 py-2"
-                onClick={() => (window.location.href = "/auth")}
+                onClick={() => {
+                  // Open expandable preview linked to Dashboard
+                  const previewModal = document.createElement("div");
+                  previewModal.className =
+                    "fixed inset-0 bg-black/50 flex items-center justify-center z-50";
+                  previewModal.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl h-[80vh] flex flex-col overflow-hidden">
+                      <div class="flex justify-between items-center p-4 border-b">
+                        <h3 class="text-xl font-bold text-[#0A3D62]">Fintr Dashboard Preview</h3>
+                        <button id="close-preview" class="text-gray-500 hover:text-gray-700">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                      </div>
+                      <div class="flex-grow overflow-auto">
+                        <iframe src="/dashboard?preview=true" class="w-full h-full border-0"></iframe>
+                      </div>
+                      <div class="p-4 border-t bg-gray-50 flex justify-between items-center">
+                        <p class="text-sm text-[#0A3D62]/70">Experience the dashboard without signing up</p>
+                        <button id="try-full-version" class="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white px-4 py-2 rounded-md text-sm">Try Full Version</button>
+                      </div>
+                    </div>
+                  `;
+                  document.body.appendChild(previewModal);
+
+                  // Add event listeners
+                  document
+                    .getElementById("close-preview")
+                    .addEventListener("click", () => {
+                      document.body.removeChild(previewModal);
+                    });
+
+                  document
+                    .getElementById("try-full-version")
+                    .addEventListener("click", () => {
+                      window.location.href = "/auth";
+                    });
+                }}
               >
                 Try Fintr <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
