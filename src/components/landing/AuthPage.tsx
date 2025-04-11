@@ -18,6 +18,16 @@ const LoginButton = () => {
   return <button onClick={() => loginWithRedirect()}>Log In</button>;
 };
 
+const LogoutButton = () => {
+  const { logout } = useAuth0();
+
+  return (
+    <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
+      Log Out
+    </button>
+  );
+};
+
 const AuthPage = ({
   onBack = () => {},
   isLogin = true,
@@ -203,7 +213,7 @@ const AuthPage = ({
 
       {authToggle && <div className="mb-6">{authToggle}</div>}
         
-      <LoginButton />
+      
       {isLoginState ? (
         <div>
           <form onSubmit={handleLoginSubmit} className="space-y-4">
