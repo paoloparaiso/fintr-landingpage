@@ -5,12 +5,18 @@ import { Label } from "../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { useToast } from "../ui/use-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface AuthPageProps {
   onBack?: () => void;
   isLogin?: boolean;
   authToggle?: React.ReactNode;
 }
+const LoginButton = () => {
+  const { loginWithRedirect } = useAuth0();
+
+  return <button onClick={() => loginWithRedirect()}>Log In</button>;
+};
 
 const AuthPage = ({
   onBack = () => {},
@@ -33,6 +39,8 @@ const AuthPage = ({
   React.useEffect(() => {
     setIsLoginState(isLogin);
   }, [isLogin]);
+
+  
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -79,7 +87,10 @@ const AuthPage = ({
       });
       return;
     }
+    
 
+   
+    
     setIsLoading(true);
 
     try {
@@ -191,7 +202,8 @@ const AuthPage = ({
       </div>
 
       {authToggle && <div className="mb-6">{authToggle}</div>}
-
+        
+      <LoginButton />
       {isLoginState ? (
         <div>
           <form onSubmit={handleLoginSubmit} className="space-y-4">

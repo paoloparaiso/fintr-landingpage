@@ -17,7 +17,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "../components/ui/tabs";
-import { createClient } from "@supabase/supabase-js";
 import {
   Edit,
   Trash2,
@@ -28,11 +27,7 @@ import {
   Tag,
   Settings,
 } from "lucide-react";
-
-// Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from "../lib/supabase";
 
 const DatabasePage = () => {
   const [activeTab, setActiveTab] = useState("categories");
