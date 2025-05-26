@@ -3,10 +3,8 @@ import Navbar from "./landing/Navbar";
 import HeroSection from "./landing/HeroSection";
 import DashboardPreview from "./landing/DashboardPreview";
 import CoreFeatures from "./landing/CoreFeatures";
-import Pricing from "./landing/Pricing";
 
 import ChatbotWidget from "./landing/ChatbotWidget";
-import MobileAppSection from "./landing/MobileAppSection";
 import Footer from "./landing/Footer";
 import { Toaster } from "./ui/toaster";
 
@@ -20,11 +18,6 @@ function Home() {
         <div id="core-features">
           <CoreFeatures />
         </div>
-        <div id="pricing">
-          <Pricing />
-        </div>
-
-        <MobileAppSection />
         <Footer />
       </main>
       <Toaster />

@@ -7,6 +7,7 @@ import { Checkbox } from "../ui/checkbox";
 import { useToast } from "../ui/use-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Toaster } from "../ui/toaster";
+import { submitWaitlistForm } from "../../lib/database";
 
 interface WaitlistSurveyProps {
   onSubmit?: (data: WaitlistFormData) => Promise<boolean>;
@@ -16,7 +17,7 @@ interface WaitlistSurveyProps {
   lastName?: string;
 }
 
-interface WaitlistFormData {
+export interface WaitlistFormData {
   firstName: string;
   lastName: string;
   email: string;
@@ -114,9 +115,22 @@ const WaitlistSurvey = ({
       return;
     }
 
+    if (!formData.email) {
+      toast({
+        title: "Missing information",
+        description: "Please provide your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      // First save to Supabase
+      await submitWaitlistForm(formData);
+
+      // Then call the onSubmit prop if provided
       const success = await onSubmit(formData);
 
       if (success) {
@@ -129,6 +143,7 @@ const WaitlistSurvey = ({
         });
       }
     } catch (error) {
+      console.error("Error submitting waitlist form:", error);
       toast({
         title: "Error",
         description: "An unexpected error occurred. Please try again.",

@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MessageSquare, Send, X } from "lucide-react";
+import { MessageSquare, Send, X, AlertCircle } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { sendChatMessage, ChatMessage } from "../../lib/openai";
 
 interface DashboardChatbotWidgetProps {
   onNavigate?: (section: string) => void;
+  initialMessage?: string;
 }
 
 const DashboardChatbotWidget = ({
   onNavigate = () => {},
+  initialMessage = "",
 }: DashboardChatbotWidgetProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -17,21 +20,32 @@ const DashboardChatbotWidget = ({
     [],
   );
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const toggleChatbot = () => {
+  const toggleChatbot = (initialMessage?: string) => {
+    const wasOpen = isOpen;
     setIsOpen(!isOpen);
     setIsMinimized(false);
-    if (!isOpen && messages.length === 0) {
-      // Add welcome message when opening for the first time
-      setTimeout(() => {
-        setMessages([
-          {
-            text: "Hi there! I'm Fintr's dashboard assistant. How can I help you today?",
-            isUser: false,
-          },
-        ]);
-      }, 300);
+    setError(null);
+
+    if (!wasOpen) {
+      if (messages.length === 0) {
+        // Add welcome message when opening for the first time
+        setTimeout(() => {
+          setMessages([
+            {
+              text: "Hi there! I'm Fintr's dashboard assistant. How can I help you today?",
+              isUser: false,
+            },
+          ]);
+        }, 300);
+      }
+
+      // If an initial message is provided, set it in the input field
+      if (initialMessage) {
+        setMessage(initialMessage);
+      }
     }
   };
 
@@ -43,56 +57,48 @@ const DashboardChatbotWidget = ({
     setIsMinimized(false);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim() === "") return;
 
     // Add user message
-    setMessages([...messages, { text: message, isUser: true }]);
+    const userMsg = message.trim();
+    setMessages([...messages, { text: userMsg, isUser: true }]);
     setIsTyping(true);
-
-    // Process the message
-    const userMessage = message.toLowerCase();
+    setError(null);
     setMessage("");
 
-    // Simulate typing delay
-    setTimeout(() => {
-      let botResponse = "";
+    try {
+      // Convert messages to OpenAI format
+      const chatHistory: ChatMessage[] = [
+        {
+          role: "system",
+          content:
+            "You are Fintr's financial assistant. You help users understand their finances, provide insights about their spending habits, and guide them through the Fintr dashboard. Be concise, helpful, and focus on financial advice and dashboard navigation. The dashboard has tabs for Transactions, Budgets, Insights, and Settings.",
+        },
+        ...messages.map((msg) => ({
+          role: msg.isUser ? "user" : "assistant",
+          content: msg.text,
+        })),
+        {
+          role: "user",
+          content: userMsg,
+        },
+      ];
 
-      // Simple routing logic based on keywords
-      if (
-        userMessage.includes("transaction") ||
-        userMessage.includes("expense") ||
-        userMessage.includes("income")
-      ) {
-        botResponse =
-          "You can view and manage all your transactions in the Transactions tab. Would you like me to navigate you there?";
-      } else if (
-        userMessage.includes("budget") ||
-        userMessage.includes("spending limit")
-      ) {
-        botResponse =
-          "You can set and track your budgets in the Budgets tab. Would you like me to show you how?";
-      } else if (
-        userMessage.includes("goal") ||
-        userMessage.includes("target")
-      ) {
-        botResponse =
-          "You can create financial goals in the Goals tab. I can help you set up a new goal if you'd like.";
-      } else if (
-        userMessage.includes("insight") ||
-        userMessage.includes("analysis") ||
-        userMessage.includes("report")
-      ) {
-        botResponse =
-          "Check out the Insights tab for detailed analysis of your finances. I can explain any chart or metric you're curious about.";
-      } else {
-        botResponse =
-          "I'm here to help you navigate your financial dashboard. You can ask about transactions, budgets, goals, or insights. What would you like to know more about?";
-      }
+      // Call OpenAI API via our Edge Function
+      const response = await sendChatMessage(chatHistory);
+      const botResponse = response.choices[0].message.content;
 
+      // Add bot response to messages
       setMessages((prev) => [...prev, { text: botResponse, isUser: false }]);
+    } catch (err) {
+      console.error("Error getting response from OpenAI:", err);
+      setError(
+        "Sorry, I'm having trouble connecting right now. Please try again later.",
+      );
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -107,9 +113,9 @@ const DashboardChatbotWidget = ({
   }, [messages]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 transition-all duration-300">
       {isOpen && !isMinimized && (
-        <div className="bg-white rounded-lg shadow-xl w-80 sm:w-96 mb-4 overflow-hidden border border-gray-200">
+        <div className="bg-white rounded-lg shadow-xl w-80 sm:w-96 mb-4 overflow-hidden border border-gray-200 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#0A3D62]">
           <div className="bg-[#0A3D62] text-white p-3 flex justify-between items-center">
             <div className="flex items-center">
               <MessageSquare className="h-5 w-5 mr-2" />
@@ -151,8 +157,9 @@ const DashboardChatbotWidget = ({
               >
                 <div
                   className={`inline-block rounded-lg px-4 py-2 max-w-[80%] ${msg.isUser ? "bg-[#0A3D62] text-white" : "bg-white border border-gray-200 text-[#0A3D62]"}`}
-                  dangerouslySetInnerHTML={{ __html: msg.text }}
-                ></div>
+                >
+                  {msg.text}
+                </div>
               </div>
             ))}
             {isTyping && (
@@ -169,6 +176,14 @@ const DashboardChatbotWidget = ({
                       style={{ animationDelay: "0.4s" }}
                     ></div>
                   </div>
+                </div>
+              </div>
+            )}
+            {error && (
+              <div className="text-left mb-3">
+                <div className="inline-block rounded-lg px-4 py-2 bg-red-50 border border-red-200 text-red-600 flex items-center">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  {error}
                 </div>
               </div>
             )}
@@ -232,10 +247,14 @@ const DashboardChatbotWidget = ({
 
       <button
         id="dashboard-chatbot-widget-button"
-        onClick={toggleChatbot}
-        className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white rounded-full p-3 shadow-lg transition-transform hover:scale-105"
+        onClick={() => toggleChatbot()}
+        className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl relative"
+        aria-label="Open AI assistant"
       >
         <MessageSquare className="h-6 w-6" />
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+          AI
+        </span>
       </button>
     </div>
   );

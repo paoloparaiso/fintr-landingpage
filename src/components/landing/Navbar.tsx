@@ -12,12 +12,7 @@ const Navbar = ({
   logoSrc = "/fintr-logo.png",
   companyName = "Fintr",
 }: NavbarProps) => {
-  const navLinks = [
-    { name: "Core Features", href: "/#core-features" },
-    { name: "Pricing", href: "/#pricing" },
-    { name: "What's Next", href: "/whats-next" },
-    { name: "Discover", href: "/discover" },
-  ];
+  const navLinks = [];
 
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -282,9 +277,11 @@ const Navbar = ({
             </nav>
             <Button
               className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white rounded-md px-6 py-2"
-              onClick={() => (window.location.href = "/auth")}
+              onClick={() => {
+                window.location.href = "/waitlist";
+              }}
             >
-              Log In / Sign Up
+              Join Waitlist
             </Button>
           </div>
         </div>
