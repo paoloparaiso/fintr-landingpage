@@ -14,7 +14,7 @@ const HeroSection = ({
   logoSrc = "/fintr-logo.png",
 }: HeroSectionProps) => {
   return (
-    <section className="relative w-full py-16 md:py-24 lg:py-32 bg-[#FAF9F6] overflow-hidden">
+    <section className="relative w-full py-8 md:py-12 lg:py-16 bg-[#FAF9F6] overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
           <motion.div
@@ -50,6 +50,11 @@ const HeroSection = ({
             </div>
           </motion.div>
         </div>
+      </div>
+
+      {/* Horizontal Divider */}
+      <div className="flex justify-center px-4 sm:px-6 lg:px-8 pt-16">
+        <div className="w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-[#0A3D62] to-transparent opacity-30"></div>
       </div>
     </section>
   );

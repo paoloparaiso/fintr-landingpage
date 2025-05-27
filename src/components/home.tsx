@@ -1,7 +1,8 @@
 import React from "react";
 import Navbar from "./landing/Navbar";
 import HeroSection from "./landing/HeroSection";
-import DashboardPreview from "./landing/DashboardPreview";
+import ProblemSection from "./landing/ProblemSection";
+import SolutionSection from "./landing/SolutionSection";
 import CoreFeatures from "./landing/CoreFeatures";
 
 import ChatbotWidget from "./landing/ChatbotWidget";
@@ -14,7 +15,8 @@ function Home() {
       <Navbar />
       <main className="pt-20">
         <HeroSection />
-        <DashboardPreview />
+        <ProblemSection />
+        <SolutionSection />
         <div id="core-features">
           <CoreFeatures />
         </div>

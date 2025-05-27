@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import {
   ArrowRight,
   Check,
-  Goal,
   Wallet,
-  CreditCard,
   PieChart,
   MessageSquare,
   BarChart3,
@@ -31,20 +29,6 @@ const CoreFeatures = ({
   subtitle = "Everything you need to take control of your finances",
   features = [
     {
-      title: "Goal Setting",
-      description:
-        "Set financial goals and track your progress with visual dashboards.",
-      bulletPoints: [
-        "Create short and long-term financial goals",
-        "Track progress with visual indicators",
-        "Receive notifications when you reach milestones",
-        "Adjust goals as your financial situation changes",
-      ],
-      icon: <Goal className="h-6 w-6" />,
-      imageSrc:
-        "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
-    },
-    {
       title: "Income & Expense Tracker",
       description: "Track all your income sources and expenses in one place.",
       bulletPoints: [
@@ -56,20 +40,6 @@ const CoreFeatures = ({
       icon: <Wallet className="h-6 w-6" />,
       imageSrc:
         "https://images.unsplash.com/photo-1554224155-1696413565d3?w=800&q=80",
-    },
-    {
-      title: "Loan Tracker",
-      description:
-        "Monitor your loans and see how much you're paying in interest.",
-      bulletPoints: [
-        "Track multiple loans in one dashboard",
-        "Calculate interest payments and principal reduction",
-        "Visualize payoff timelines",
-        "Simulate early payoff scenarios",
-      ],
-      icon: <CreditCard className="h-6 w-6" />,
-      imageSrc:
-        "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80",
     },
     {
       title: "Budget Tracker",
@@ -106,7 +76,7 @@ const CoreFeatures = ({
   };
 
   return (
-    <section className="py-16 md:py-24 bg-[#FAF9F6]">
+    <section className="py-8 md:py-12 bg-[#FAF9F6]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="max-w-3xl mb-12 md:mb-16 mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#0A3D62]">
