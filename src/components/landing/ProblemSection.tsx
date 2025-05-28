@@ -66,10 +66,10 @@ const ProblemSection = ({
             >
               <div className="flex flex-col items-center text-center">
                 <div className="mb-4">{problem.icon}</div>
-                <h3 className="text-xl font-bold mb-3 text-[#0A3D62]">
+                <h3 className="text-xl font-bold mb-4 text-[#0A3D62] px-2">
                   {problem.title}
                 </h3>
-                <p className="text-[#0A3D62]/80">{problem.description}</p>
+                <p className="text-[#0A3D62]/80 px-2">{problem.description}</p>
               </div>
             </motion.div>
           ))}

@@ -7,8 +7,9 @@ import { Checkbox } from "../ui/checkbox";
 import { useToast } from "../ui/use-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Toaster } from "../ui/toaster";
-import { submitWaitlistForm } from "../../lib/database";
+
 import { Textarea } from "../ui/textarea";
+import { submitWaitlistForm } from "../../lib/database";
 
 interface WaitlistSurveyProps {
   onSubmit?: (data: WaitlistFormData) => Promise<boolean>;
@@ -22,7 +23,7 @@ export interface WaitlistFormData {
   firstName: string;
   lastName: string;
   email: string;
-  finance_tracking_method: string;
+  finance_tracking_method: string[];
   custom_tracking_method?: string;
   finance_app_name?: string;
   money_frustration: string;
@@ -32,9 +33,13 @@ export interface WaitlistFormData {
 
 const WaitlistSurvey = ({
   onSubmit = async (data) => {
-    // Mock successful submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    return true;
+    try {
+      await submitWaitlistForm(data);
+      return true;
+    } catch (error) {
+      console.error("Error submitting waitlist form:", error);
+      return false;
+    }
   },
   onBack = () => {},
   email = "",
@@ -45,7 +50,7 @@ const WaitlistSurvey = ({
     firstName: firstName,
     lastName: lastName,
     email: email,
-    finance_tracking_method: "",
+    finance_tracking_method: [],
     custom_tracking_method: "",
     finance_app_name: "",
     money_frustration: "",
@@ -64,7 +69,11 @@ const WaitlistSurvey = ({
   };
 
   const handleRadioChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "finance_tracking_method") {
+      setFormData((prev) => ({ ...prev, [name]: [value] }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleCheckboxChange = (
@@ -84,7 +93,7 @@ const WaitlistSurvey = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation
+    // Basic validation - all fields are required
     if (!formData.firstName || !formData.lastName) {
       toast({
         title: "Missing information",
@@ -103,10 +112,32 @@ const WaitlistSurvey = ({
       return;
     }
 
-    if (!formData.finance_tracking_method) {
+    if (
+      !formData.finance_tracking_method ||
+      formData.finance_tracking_method.length === 0
+    ) {
       toast({
         title: "Missing information",
         description: "Please select how you currently track your finances.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.money_frustration.trim()) {
+      toast({
+        title: "Missing information",
+        description:
+          "Please tell us what frustrates you most about managing your finances.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.desired_features.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please tell us what features you want in a finance app.",
         variant: "destructive",
       });
       return;
@@ -124,7 +155,7 @@ const WaitlistSurvey = ({
 
     // Additional validation for conditional fields
     if (
-      formData.finance_tracking_method === "finance_app" &&
+      formData.finance_tracking_method.includes("finance_app") &&
       !formData.finance_app_name
     ) {
       toast({
@@ -136,7 +167,7 @@ const WaitlistSurvey = ({
     }
 
     if (
-      formData.finance_tracking_method === "other_tracking" &&
+      formData.finance_tracking_method.includes("other_tracking") &&
       !formData.custom_tracking_method
     ) {
       toast({
@@ -150,7 +181,7 @@ const WaitlistSurvey = ({
     setIsSubmitting(true);
 
     try {
-      // Prepare the form data - ensure all fields have values to prevent null/undefined errors
+      // Prepare the form data
       const submissionData = {
         ...formData,
         custom_tracking_method: formData.custom_tracking_method || "",
@@ -159,33 +190,10 @@ const WaitlistSurvey = ({
         desired_features: formData.desired_features || "",
       };
 
-      let supabaseSuccess = false;
-      let onSubmitSuccess = false;
+      // Call the onSubmit prop
+      const success = await onSubmit(submissionData);
 
-      // Try to save to Supabase
-      try {
-        await submitWaitlistForm(submissionData);
-        supabaseSuccess = true;
-        console.log("Supabase submission successful");
-      } catch (supabaseError) {
-        console.error("Supabase submission failed:", supabaseError);
-        // Continue with the flow even if Supabase fails
-      }
-
-      // Call the onSubmit prop if provided
-      try {
-        onSubmitSuccess = await onSubmit(submissionData);
-        console.log("onSubmit result:", onSubmitSuccess);
-      } catch (onSubmitError) {
-        console.error("onSubmit failed:", onSubmitError);
-        onSubmitSuccess = true; // Default to success if onSubmit fails
-      }
-
-      // Show success if either submission worked, or if we have basic form validation success
-      if (supabaseSuccess || onSubmitSuccess) {
-        console.log(
-          "Form submission successful, redirecting to thank you page",
-        );
+      if (success) {
         setShowThankYou(true);
       } else {
         toast({
@@ -195,7 +203,6 @@ const WaitlistSurvey = ({
         });
       }
     } catch (error) {
-      console.error("Unexpected error during form submission:", error);
       toast({
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
@@ -298,7 +305,7 @@ const WaitlistSurvey = ({
             <div className="space-y-3">
               <Label>How do you currently track your finances?</Label>
               <RadioGroup
-                value={formData.finance_tracking_method}
+                value={formData.finance_tracking_method[0] || ""}
                 onValueChange={(value) =>
                   handleRadioChange("finance_tracking_method", value)
                 }
@@ -331,7 +338,7 @@ const WaitlistSurvey = ({
                     />
                     <Label htmlFor="finance_app">Finance app</Label>
                   </div>
-                  {formData.finance_tracking_method === "finance_app" && (
+                  {formData.finance_tracking_method.includes("finance_app") && (
                     <Input
                       id="finance_app_name"
                       name="finance_app_name"
@@ -359,7 +366,9 @@ const WaitlistSurvey = ({
                     />
                     <Label htmlFor="other_tracking">Other</Label>
                   </div>
-                  {formData.finance_tracking_method === "other_tracking" && (
+                  {formData.finance_tracking_method.includes(
+                    "other_tracking",
+                  ) && (
                     <Input
                       id="custom_tracking_method"
                       name="custom_tracking_method"
