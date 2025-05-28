@@ -15,24 +15,26 @@ interface SolutionSectionProps {
 }
 
 const SolutionSection = ({
-  title = "Your Own Personal Finance Development Assistant",
-  subtitle = "How Fintr helps you take control of your finances",
+  title = "Your Personal Finance Development App",
+  subtitle = "How Fintr helps you take control of your money.",
   solutions = [
     {
-      title: "Track Your Money",
+      title: "Simplify Tracking Your Money",
       description:
-        "Easily track your money to understand your financial health",
-      icon: <LineChart className="h-8 w-8" />,
+        "Just take a photo of your receipt, Fintr labels and logs it for you.",
+      icon: <LineChart className="h-12 w-12" />,
     },
     {
-      title: "Get Personalized Answers",
-      description: "Answer your money questions based on your own data",
-      icon: <MessageSquare className="h-8 w-8" />,
+      title: "Get Personalized Money Answers",
+      description:
+        'Ask questions like "can I afford this?" or "should I pay off my loan first?". Fintr gives answers based on your own data.',
+      icon: <MessageSquare className="h-12 w-12" />,
     },
     {
-      title: "Compare Financial Options",
-      description: "Compare financial options and choose what's best for you",
-      icon: <BarChart3 className="h-8 w-8" />,
+      title: "Make Smarter Financial Decisions",
+      description:
+        "Thinking of buying a condo or taking a loan? Fintr figures out your options, and shows what you can truly afford.",
+      icon: <BarChart3 className="h-12 w-12" />,
     },
   ],
 }: SolutionSectionProps) => {
@@ -57,20 +59,13 @@ const SolutionSection = ({
               className={`${index === 0 ? "bg-[#E7EEF7]" : index === 1 ? "bg-[#CAC8DA]" : "bg-[#BFD3CD]"} backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300`}
             >
               <div className="flex flex-col items-center text-center">
-                <div className="bg-white/80 p-4 rounded-full mb-4">
-                  {solution.icon}
-                </div>
+                <div className="mb-4">{solution.icon}</div>
                 <h3 className="text-xl font-bold mb-3">{solution.title}</h3>
                 <p className="text-[#0A3D62]/70">{solution.description}</p>
               </div>
             </motion.div>
           ))}
         </div>
-      </div>
-
-      {/* Horizontal Divider */}
-      <div className="flex justify-center px-4 sm:px-6 lg:px-8 pt-16">
-        <div className="w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-[#0A3D62] to-transparent opacity-30"></div>
       </div>
     </section>
   );

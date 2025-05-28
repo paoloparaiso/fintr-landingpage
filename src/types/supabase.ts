@@ -11,73 +11,46 @@ export type Database = {
     Tables: {
       waitlist_submissions: {
         Row: {
-          challenges: string[] | null
-          check_frequency: string | null
-          concerns: string[] | null
           created_at: string | null
-          current_tracking: string | null
-          custom_challenges: string | null
-          custom_concerns: string | null
-          custom_features: string | null
-          custom_financial_goals: string | null
-          early_access: string | null
+          custom_tracking_method: string | null
+          desired_features: string | null
+          early_access_interest: string | null
           email: string
-          financial_goals: string[] | null
+          finance_app_name: string | null
+          finance_tracking_method: string[] | null
           first_name: string
           id: string
           last_name: string
-          platform: string | null
-          premium_amount: string | null
-          premium_willingness: string | null
-          stay_connected: string | null
+          money_frustration: string | null
           updated_at: string | null
-          useful_features: string[] | null
         }
         Insert: {
-          challenges?: string[] | null
-          check_frequency?: string | null
-          concerns?: string[] | null
           created_at?: string | null
-          current_tracking?: string | null
-          custom_challenges?: string | null
-          custom_concerns?: string | null
-          custom_features?: string | null
-          custom_financial_goals?: string | null
-          early_access?: string | null
+          custom_tracking_method?: string | null
+          desired_features?: string | null
+          early_access_interest?: string | null
           email: string
-          financial_goals?: string[] | null
+          finance_app_name?: string | null
+          finance_tracking_method?: string[] | null
           first_name: string
           id?: string
           last_name: string
-          platform?: string | null
-          premium_amount?: string | null
-          premium_willingness?: string | null
-          stay_connected?: string | null
+          money_frustration?: string | null
           updated_at?: string | null
-          useful_features?: string[] | null
         }
         Update: {
-          challenges?: string[] | null
-          check_frequency?: string | null
-          concerns?: string[] | null
           created_at?: string | null
-          current_tracking?: string | null
-          custom_challenges?: string | null
-          custom_concerns?: string | null
-          custom_features?: string | null
-          custom_financial_goals?: string | null
-          early_access?: string | null
+          custom_tracking_method?: string | null
+          desired_features?: string | null
+          early_access_interest?: string | null
           email?: string
-          financial_goals?: string[] | null
+          finance_app_name?: string | null
+          finance_tracking_method?: string[] | null
           first_name?: string
           id?: string
           last_name?: string
-          platform?: string | null
-          premium_amount?: string | null
-          premium_willingness?: string | null
-          stay_connected?: string | null
+          money_frustration?: string | null
           updated_at?: string | null
-          useful_features?: string[] | null
         }
         Relationships: []
       }

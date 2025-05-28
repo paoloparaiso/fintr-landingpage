@@ -1,6 +1,12 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { AlertCircle, DollarSign, LineChart } from "lucide-react";
+import {
+  AlertCircle,
+  DollarSign,
+  LineChart,
+  HelpCircle,
+  TrendingDown,
+} from "lucide-react";
 
 interface ProblemItem {
   title: string;
@@ -15,25 +21,26 @@ interface ProblemSectionProps {
 }
 
 const ProblemSection = ({
-  title = "The Problems We Solve",
-  subtitle = "Financial challenges that most people face today",
+  title = "Managing Money Feels So Hard?",
+  subtitle = "Have you ever experienced any (or all) of these?",
   problems = [
     {
-      title: "No Tracking System",
+      title: "I don't know where my money goes",
       description:
-        "Most people don't use a system to track where their money goes",
-      icon: <LineChart className="h-8 w-8" />,
+        "You want to track your money but don't know where to begin, or it just feels too hard to input every expense.",
+      icon: <HelpCircle className="h-12 w-12 text-[#0A3D62]" />,
     },
     {
-      title: "Inaccessible Financial Advice",
-      description: "Financial advice is either biased, or too costly to access",
-      icon: <AlertCircle className="h-8 w-8" />,
+      title: "Financial advice is too expensive or confusing",
+      description:
+        "You've asked friends or searched online, but nothing feels right for your situation. Hiring a financial expert? It just feels out of reach.",
+      icon: <span className="text-5xl font-bold text-[#0A3D62]">₱</span>,
     },
     {
-      title: "Unclear Financial Health",
+      title: "I'm not sure if I can afford what I want",
       description:
-        "Spend or invest without a clear view of financial health and goals",
-      icon: <DollarSign className="h-8 w-8" />,
+        "You've made a purchase or plan without fully understanding your financial health, and it caused you problems later on.",
+      icon: <TrendingDown className="h-12 w-12 text-[#0A3D62]" />,
     },
   ],
 }: ProblemSectionProps) => {
@@ -58,9 +65,7 @@ const ProblemSection = ({
               className={`${index === 0 ? "bg-[#E9A48C]" : index === 1 ? "bg-[#EACCCD]" : "bg-[#E5DBC9]"} backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300`}
             >
               <div className="flex flex-col items-center text-center">
-                <div className="bg-white/80 p-4 rounded-full mb-4 text-[#0A3D62]">
-                  {problem.icon}
-                </div>
+                <div className="mb-4">{problem.icon}</div>
                 <h3 className="text-xl font-bold mb-3 text-[#0A3D62]">
                   {problem.title}
                 </h3>

@@ -3,7 +3,6 @@ import Navbar from "./landing/Navbar";
 import HeroSection from "./landing/HeroSection";
 import ProblemSection from "./landing/ProblemSection";
 import SolutionSection from "./landing/SolutionSection";
-import CoreFeatures from "./landing/CoreFeatures";
 
 import ChatbotWidget from "./landing/ChatbotWidget";
 import Footer from "./landing/Footer";
@@ -17,9 +16,6 @@ function Home() {
         <HeroSection />
         <ProblemSection />
         <SolutionSection />
-        <div id="core-features">
-          <CoreFeatures />
-        </div>
         <Footer />
       </main>
       <Toaster />

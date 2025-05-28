@@ -9,8 +9,8 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({
-  title = "Save More. Spend Smarter. Ask Fintr Anything About Your Money.",
-  subtitle = "Fintr helps you track your spending, reduce unnecessary expenses, and answer your money questions instantly.",
+  title = "Save More. Spend Smarter. Afford More of What You Want.",
+  subtitle = "Just take a photo of your receipt, Fintr will do the rest. Get answers to your money questions based on your data.",
   logoSrc = "/fintr-logo.png",
 }: HeroSectionProps) => {
   return (
