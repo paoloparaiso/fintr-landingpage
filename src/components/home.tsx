@@ -3,8 +3,6 @@ import Navbar from "./landing/Navbar";
 import HeroSection from "./landing/HeroSection";
 import ProblemSection from "./landing/ProblemSection";
 import SolutionSection from "./landing/SolutionSection";
-
-import ChatbotWidget from "./landing/ChatbotWidget";
 import Footer from "./landing/Footer";
 import { Toaster } from "./ui/toaster";
 
