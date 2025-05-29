@@ -33,7 +33,7 @@ const SolutionSection = ({
     {
       title: "Make Smarter Financial Decisions",
       description:
-        "Thinking of buying a condo or taking a loan? Fintr figures out your options, and shows what you can truly afford.",
+        "Thinking of taking a loan, buying an insurance plan, or a condo? Fintr figures out your options, and shows what you can truly afford.",
       icon: <BarChart3 className="h-12 w-12" />,
     },
   ],

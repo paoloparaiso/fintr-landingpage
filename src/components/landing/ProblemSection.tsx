@@ -31,7 +31,7 @@ const ProblemSection = ({
       icon: <HelpCircle className="h-12 w-12 text-[#0A3D62]" />,
     },
     {
-      title: "Financial advice feels too expensive or confusing?",
+      title: "Financial advice feels confusing or expensive?",
       description:
         "You've asked family, friends or searched online, but nothing feels right for your situation. Hiring a financial expert? It just feels out of reach.",
       icon: <span className="text-5xl font-bold text-[#0A3D62]">₱</span>,
