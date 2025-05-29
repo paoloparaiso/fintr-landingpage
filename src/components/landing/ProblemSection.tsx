@@ -25,19 +25,19 @@ const ProblemSection = ({
   subtitle = "Have you ever experienced any (or all) of these?",
   problems = [
     {
-      title: "I don't know where my money goes",
+      title: "Do you know where your money goes?",
       description:
-        "You want to track your money but don't know where to begin, or it just feels too hard to input every expense.",
+        "You make enough money, but can't seem to save? You want to track your money but don't know where to begin.",
       icon: <HelpCircle className="h-12 w-12 text-[#0A3D62]" />,
     },
     {
-      title: "Financial advice is too expensive or confusing",
+      title: "Financial advice feels too expensive or confusing?",
       description:
-        "You've asked friends or searched online, but nothing feels right for your situation. Hiring a financial expert? It just feels out of reach.",
+        "You've asked family, friends or searched online, but nothing feels right for your situation. Hiring a financial expert? It just feels out of reach.",
       icon: <span className="text-5xl font-bold text-[#0A3D62]">₱</span>,
     },
     {
-      title: "I'm not sure if I can afford what I want",
+      title: "Not sure if you can afford what you want?",
       description:
         "You've made a purchase or plan without fully understanding your financial health, and it caused you problems later on.",
       icon: <TrendingDown className="h-12 w-12 text-[#0A3D62]" />,
