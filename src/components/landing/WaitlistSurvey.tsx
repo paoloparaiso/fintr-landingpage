@@ -215,14 +215,13 @@ const WaitlistSurvey = ({
 
   if (showThankYou) {
     return (
-      <div className="w-full h-screen max-h-screen overflow-hidden bg-[#FAF9F6] flex items-center justify-center">
+      <div className="w-full h-full bg-[#FAF9F6] flex items-center justify-center">
         <div className="max-w-2xl mx-auto text-center p-6 flex flex-col items-center">
           <h2 className="text-2xl font-bold text-[#0A3D62] mb-4">
             Thank You for Joining the Waitlist!
           </h2>
           <p className="text-[#0A3D62]/80 mb-4">
-            You're awesome! Your input will help us make Fintr better and more
-            tailored for you.
+            You're awesome! Your input will help us make Fintr to your need.
           </p>
           <p className="text-[#0A3D62]/80 mb-4">
             We'll email you soon with your exclusive early access details. Stay
@@ -242,9 +241,9 @@ const WaitlistSurvey = ({
   }
 
   return (
-    <div className="w-full h-screen max-h-screen overflow-y-auto overflow-x-hidden bg-[#FAF9F6]">
-      <main className="py-10 min-h-full">
-        <div className="max-w-2xl mx-auto p-6 min-h-[calc(100vh-5rem)]">
+    <div className="w-full h-full flex flex-col bg-[#FAF9F6]">
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-2xl mx-auto p-6">
           <div className="mb-6">
             <button
               onClick={onBack}
@@ -446,7 +445,7 @@ const WaitlistSurvey = ({
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-12 bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white font-medium transition-colors rounded-md"
+              className="w-full h-12 bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white font-medium transition-colors rounded-md mb-6"
             >
               {isSubmitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -456,7 +455,7 @@ const WaitlistSurvey = ({
             </Button>
           </form>
         </div>
-      </main>
+      </div>
       <Toaster />
     </div>
   );
