@@ -215,38 +215,36 @@ const WaitlistSurvey = ({
 
   if (showThankYou) {
     return (
-      <div className="w-full min-h-screen overflow-x-hidden bg-[#FAF9F6]">
-        <main className="py-10">
-          <div className="max-w-2xl mx-auto text-center p-6 flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-[#0A3D62] mb-4">
-              Thank You for Joining the Waitlist!
-            </h2>
-            <p className="text-[#0A3D62]/80 mb-4">
-              You're awesome! Your input will help us make Fintr better and more
-              tailored for you.
-            </p>
-            <p className="text-[#0A3D62]/80 mb-4">
-              We'll email you soon with your exclusive early access details.
-              Stay tuned for updates and surprises as we get closer to launch.
-            </p>
-            <p className="text-[#0A3D62]/80 font-medium mb-8">Talk soon!</p>
-            <Button
-              onClick={() => (window.location.href = "/")}
-              className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white font-medium transition-colors rounded-md px-6 py-2"
-            >
-              Return to Home
-            </Button>
-          </div>
-        </main>
+      <div className="w-full h-screen max-h-screen overflow-hidden bg-[#FAF9F6] flex items-center justify-center">
+        <div className="max-w-2xl mx-auto text-center p-6 flex flex-col items-center">
+          <h2 className="text-2xl font-bold text-[#0A3D62] mb-4">
+            Thank You for Joining the Waitlist!
+          </h2>
+          <p className="text-[#0A3D62]/80 mb-4">
+            You're awesome! Your input will help us make Fintr better and more
+            tailored for you.
+          </p>
+          <p className="text-[#0A3D62]/80 mb-4">
+            We'll email you soon with your exclusive early access details. Stay
+            tuned for updates and surprises as we get closer to launch.
+          </p>
+          <p className="text-[#0A3D62]/80 font-medium mb-8">Talk soon!</p>
+          <Button
+            onClick={() => (window.location.href = "/")}
+            className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white font-medium transition-colors rounded-md px-6 py-2"
+          >
+            Return to Home
+          </Button>
+        </div>
         <Toaster />
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen overflow-x-hidden bg-[#FAF9F6]">
-      <main className="py-10">
-        <div className="max-w-2xl mx-auto p-6">
+    <div className="w-full h-screen max-h-screen overflow-y-auto overflow-x-hidden bg-[#FAF9F6]">
+      <main className="py-10 min-h-full">
+        <div className="max-w-2xl mx-auto p-6 min-h-[calc(100vh-5rem)]">
           <div className="mb-6">
             <button
               onClick={onBack}

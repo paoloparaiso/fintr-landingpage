@@ -8,9 +8,9 @@ import { Toaster } from "./ui/toaster";
 
 function Home() {
   return (
-    <div className="w-full min-h-screen overflow-x-hidden">
+    <div className="w-full h-screen overflow-hidden flex flex-col">
       <Navbar />
-      <main className="pt-20">
+      <main className="flex-1 overflow-y-auto pt-20">
         <HeroSection />
         <ProblemSection />
         <SolutionSection />

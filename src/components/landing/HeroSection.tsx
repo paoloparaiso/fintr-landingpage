@@ -28,7 +28,8 @@ const HeroSection = ({
                 .map((word) =>
                   word.toLowerCase() === "to" ||
                   word.toLowerCase() === "from" ||
-                  word.toLowerCase() === "at"
+                  word.toLowerCase() === "at" ||
+                  word.toLowerCase() === "of"
                     ? word.toLowerCase()
                     : word.charAt(0).toUpperCase() +
                       word.slice(1).toLowerCase(),
@@ -42,7 +43,7 @@ const HeroSection = ({
 
             <div className="w-full max-w-md mx-auto">
               <WaitlistForm
-                buttonText="Join the Waitlist for Early Access"
+                buttonText="Join Waitlist for Early Access"
                 placeholderText="Enter your email address"
                 className="shadow-none"
                 redirectTo="/waitlist"

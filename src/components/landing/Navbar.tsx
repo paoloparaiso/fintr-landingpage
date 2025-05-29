@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   logoSrc?: string;
@@ -11,6 +12,7 @@ const Navbar = ({
   companyName = "Fintr",
 }: NavbarProps) => {
   const navLinks = [];
+  const navigate = useNavigate();
 
   // Navbar state and logic removed
 
@@ -43,7 +45,7 @@ const Navbar = ({
             <Button
               className="bg-[#0A3D62] hover:bg-[#0A3D62]/80 text-white rounded-md px-6 py-2"
               onClick={() => {
-                window.location.href = "/waitlist";
+                navigate("/waitlist");
               }}
             >
               Join Waitlist
