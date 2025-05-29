@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useToast } from "../ui/use-toast";
 import { Mail, ArrowRight, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import WaitlistSurvey from "./WaitlistSurvey";
 
 interface WaitlistFormProps {
@@ -22,18 +23,19 @@ const WaitlistForm = ({
   buttonText = "Join Waitlist",
   placeholderText = "Enter your email",
   className = "",
-  redirectTo = "/auth",
+  redirectTo = "/waitlist",
 }: WaitlistFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Redirect to specified page
-      window.location.href = redirectTo;
+      // Use React Router navigation instead of window.location
+      navigate(redirectTo);
     } catch (error) {
       toast({
         title: "Error",

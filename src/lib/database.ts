@@ -1,5 +1,6 @@
 import type { Database } from "../types/supabase";
 import { supabase } from "./supabase";
+import type { WaitlistFormData } from "../components/landing/WaitlistSurvey";
 
 // User related functions
 export async function getCurrentUser() {
@@ -132,6 +133,29 @@ export async function getGoals(userId: string) {
 
   if (error) throw error;
   return data;
+}
+
+// Waitlist related functions
+export async function submitWaitlistForm(formData: WaitlistFormData) {
+  const { data, error } = await supabase
+    .from("waitlist_submissions")
+    .insert([
+      {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        finance_tracking_method: formData.finance_tracking_method,
+        custom_tracking_method: formData.custom_tracking_method || null,
+        finance_app_name: formData.finance_app_name || null,
+        money_frustration: formData.money_frustration,
+        desired_features: formData.desired_features,
+        early_access_interest: formData.early_access_interest,
+      },
+    ])
+    .select();
+
+  if (error) throw error;
+  return data[0];
 }
 
 export async function createGoal(goal: {

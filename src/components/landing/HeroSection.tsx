@@ -9,12 +9,12 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({
-  title = "Your Tracker to Financial Freedom",
-  subtitle = "Fintr helps you understand, manage, and optimize your money with intelligent insights that put your financial safety at the frontier.",
+  title = "Save More. Spend Smarter. Afford More of What You Want.",
+  subtitle = "Just take a photo of your receipt, Fintr will do the rest. Get answers to your money questions based on your data.",
   logoSrc = "/fintr-logo.png",
 }: HeroSectionProps) => {
   return (
-    <section className="relative w-full py-16 md:py-24 lg:py-32 bg-[#FAF9F6] overflow-hidden">
+    <section className="relative w-full py-8 md:py-12 lg:py-16 bg-[#FAF9F6] overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
           <motion.div
@@ -28,7 +28,8 @@ const HeroSection = ({
                 .map((word) =>
                   word.toLowerCase() === "to" ||
                   word.toLowerCase() === "from" ||
-                  word.toLowerCase() === "at"
+                  word.toLowerCase() === "at" ||
+                  word.toLowerCase() === "of"
                     ? word.toLowerCase()
                     : word.charAt(0).toUpperCase() +
                       word.slice(1).toLowerCase(),
@@ -37,13 +38,12 @@ const HeroSection = ({
             </h1>
 
             <p className="text-lg md:text-xl text-[#0A3D62] mb-8 leading-relaxed">
-              Fintr helps you take control of your money so you can achieve your
-              own financial freedom - whatever it may be.
+              {subtitle}
             </p>
 
             <div className="w-full max-w-md mx-auto">
               <WaitlistForm
-                buttonText="Join the Waitlist for Early Access"
+                buttonText="Join Waitlist for Early Access"
                 placeholderText="Enter your email address"
                 className="shadow-none"
                 redirectTo="/waitlist"
@@ -51,6 +51,11 @@ const HeroSection = ({
             </div>
           </motion.div>
         </div>
+      </div>
+
+      {/* Horizontal Divider */}
+      <div className="flex justify-center px-4 sm:px-6 lg:px-8 pt-16">
+        <div className="w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-[#0A3D62] to-transparent opacity-30"></div>
       </div>
     </section>
   );

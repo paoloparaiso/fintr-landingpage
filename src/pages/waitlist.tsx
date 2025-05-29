@@ -24,7 +24,7 @@ const Waitlist = () => {
   };
 
   return (
-    <div className="min-h-screen" id="waitlist">
+    <div className="fixed inset-0 overflow-hidden" id="waitlist">
       <WaitlistSurvey
         onBack={handleBack}
         email={email}

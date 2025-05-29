@@ -1,30 +1,19 @@
 import React from "react";
 import Navbar from "./landing/Navbar";
 import HeroSection from "./landing/HeroSection";
-import DashboardPreview from "./landing/DashboardPreview";
-import CoreFeatures from "./landing/CoreFeatures";
-import Pricing from "./landing/Pricing";
-
-import ChatbotWidget from "./landing/ChatbotWidget";
-import MobileAppSection from "./landing/MobileAppSection";
+import ProblemSection from "./landing/ProblemSection";
+import SolutionSection from "./landing/SolutionSection";
 import Footer from "./landing/Footer";
 import { Toaster } from "./ui/toaster";
 
 function Home() {
   return (
-    <div className="w-full min-h-screen overflow-x-hidden">
+    <div className="w-full h-screen overflow-hidden flex flex-col">
       <Navbar />
-      <main className="pt-20">
+      <main className="flex-1 overflow-y-auto pt-20">
         <HeroSection />
-        <DashboardPreview />
-        <div id="core-features">
-          <CoreFeatures />
-        </div>
-        <div id="pricing">
-          <Pricing />
-        </div>
-
-        <MobileAppSection />
+        <ProblemSection />
+        <SolutionSection />
         <Footer />
       </main>
       <Toaster />
