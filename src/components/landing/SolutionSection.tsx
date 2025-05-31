@@ -15,7 +15,7 @@ interface SolutionSectionProps {
 }
 
 const SolutionSection = ({
-  title = "Your Personal Finance Development App",
+  title = "Your Personal Finance Assistant",
   subtitle = "How Fintr helps you take control of your money.",
   solutions = [
     {
@@ -33,7 +33,7 @@ const SolutionSection = ({
     {
       title: "Make Smarter Financial Decisions",
       description:
-        "Thinking of taking a loan, buying an insurance plan, or a condo? Fintr figures out your options, and shows what you can truly afford.",
+        "Thinking of taking a loan, getting an insurance, or buying a condo? Fintr figures out your options, and shows what you can truly afford.",
       icon: <BarChart3 className="h-12 w-12" />,
     },
   ],

@@ -25,13 +25,13 @@ const ProblemSection = ({
   subtitle = "Have you ever experienced any (or all) of these?",
   problems = [
     {
-      title: "Do you know where your money goes?",
+      title: "Don't know where your money goes?",
       description:
-        "You make enough money, but can't seem to save? You want to track your money but don't know where to begin.",
+        "You make enough money, but can't seem to save? You want to track your money, but don't know where to begin?",
       icon: <HelpCircle className="h-12 w-12 text-[#0A3D62]" />,
     },
     {
-      title: "Financial advice feels confusing or expensive?",
+      title: "Financial advice feels confusing or expensive for you?",
       description:
         "You've asked family, friends or searched online, but nothing feels right for your situation. Hiring a financial expert? It just feels out of reach.",
       icon: <span className="text-5xl font-bold text-[#0A3D62]">₱</span>,
